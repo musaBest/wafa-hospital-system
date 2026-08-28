@@ -1,27 +1,17 @@
 import React, { useState } from 'react';
-import { Building2, Lock, Mail, ShieldAlert, KeyRound, CheckCircle, ArrowRight, UserCheck } from 'lucide-react';
-import { useAuth, DEMO_ACCOUNTS } from '../../context/AuthContext';
+import { Building2, Lock, Mail, ShieldAlert, KeyRound, ShieldCheck } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function StaffLogin() {
-  const { login, switchDemoRole, loading } = useAuth();
-  const [email, setEmail] = useState('admin@wafa.hospital');
-  const [password, setPassword] = useState('password123');
+  const { login, loading } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     const res = await login(email, password);
-    if (!res.success) {
-      setErrorMessage(res.message);
-    }
-  };
-
-  const handleQuickLogin = async (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword('password123');
-    setErrorMessage('');
-    const res = await switchDemoRole(demoEmail);
     if (!res.success) {
       setErrorMessage(res.message);
     }
@@ -42,8 +32,8 @@ export default function StaffLogin() {
         className="clinical-card medical-file-tab"
         style={{
           width: '100%',
-          maxWidth: '520px',
-          padding: '36px 32px',
+          maxWidth: '480px',
+          padding: '40px 36px',
           boxShadow: 'var(--shadow-clinical-lg)',
           backgroundColor: '#FFFFFF',
         }}
@@ -52,25 +42,25 @@ export default function StaffLogin() {
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div
             style={{
-              width: '56px',
-              height: '56px',
+              width: '60px',
+              height: '60px',
               borderRadius: '12px',
               backgroundColor: 'var(--hospital-pine)',
               color: '#FFFFFF',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 10px rgba(20, 77, 67, 0.3)',
-              marginBottom: '14px',
+              boxShadow: '0 4px 12px rgba(20, 77, 67, 0.3)',
+              marginBottom: '16px',
             }}
           >
-            <Building2 size={30} />
+            <Building2 size={32} />
           </div>
           <h1 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--hospital-pine-dark)', lineHeight: '1.3' }}>
             مستشفى الوفاء للتأهيل الطبي والجراحة التخصصية
           </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            بوابة تسجيل دخول الكادر الطبي والإداري الموحدة (Staff Portal)
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '6px' }}>
+            بوابة تسجيل دخول الكادر الطبي والإداري المعتمد
           </p>
         </div>
 
@@ -83,9 +73,9 @@ export default function StaffLogin() {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">البريد الإلكتروني المهني / اسم المستخدم</label>
+            <label className="form-label">البريد الإلكتروني المهني</label>
             <div style={{ position: 'relative' }}>
               <Mail
                 size={16}
@@ -102,15 +92,16 @@ export default function StaffLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="form-control"
+                className="form-control num-tabular"
                 placeholder="name@wafa.hospital"
                 style={{ paddingRight: '36px' }}
+                autoComplete="email"
               />
             </div>
           </div>
 
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">كلمة المرور</label>
+            <label className="form-label">كلمة المرور السرية</label>
             <div style={{ position: 'relative' }}>
               <Lock
                 size={16}
@@ -130,6 +121,7 @@ export default function StaffLogin() {
                 className="form-control"
                 placeholder="••••••••"
                 style={{ paddingRight: '36px' }}
+                autoComplete="current-password"
               />
             </div>
           </div>
@@ -138,52 +130,30 @@ export default function StaffLogin() {
             type="submit"
             className="btn btn-primary"
             disabled={loading}
-            style={{ width: '100%', padding: '11px', fontSize: '15px', fontWeight: '700', marginTop: '6px' }}
+            style={{ width: '100%', padding: '12px', fontSize: '15px', fontWeight: '700', marginTop: '6px' }}
           >
             <KeyRound size={17} />
-            <span>{loading ? 'جاري التحقق...' : 'تسجيل الدخول'}</span>
+            <span>{loading ? 'جاري التحقق والمصادقة...' : 'تسجيل الدخول للنظام'}</span>
           </button>
         </form>
 
-        {/* Quick Demo Role Switcher for Testing & Evaluation */}
-        <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border-light)' }}>
-          <div
-            style={{
-              fontSize: '12px',
-              fontWeight: '700',
-              color: 'var(--clinical-slate)',
-              marginBottom: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span>اختبار الأدوار السريرية (RBAC Demo Accounts):</span>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>كلمة المرور: password123</span>
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {DEMO_ACCOUNTS.map((acc) => (
-              <button
-                key={acc.role}
-                type="button"
-                onClick={() => handleQuickLogin(acc.email)}
-                className={`badge badge-${acc.color}`}
-                style={{
-                  padding: '6px 10px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  border: '1px solid var(--border-medium)',
-                  transition: 'all 0.15s ease',
-                }}
-                title={`تسجيل الدخول كـ: ${acc.email}`}
-              >
-                <UserCheck size={12} />
-                <span>{acc.label}</span>
-              </button>
-            ))}
-          </div>
+        {/* Security Notice Footer */}
+        <div
+          style={{
+            marginTop: '28px',
+            paddingTop: '18px',
+            borderTop: '1px solid var(--border-light)',
+            textAlign: 'center',
+            fontSize: '12px',
+            color: 'var(--text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+          }}
+        >
+          <ShieldCheck size={14} style={{ color: 'var(--hospital-pine)' }} />
+          <span>نظام محمي ومشفر — يتم تسجيل وتدقيق كافة عمليات الدخول</span>
         </div>
       </div>
     </div>

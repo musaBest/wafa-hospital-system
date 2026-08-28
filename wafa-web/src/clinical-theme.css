@@ -508,13 +508,13 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1050;
-  padding: 20px;
+  padding: 16px;
 }
 
 .modal-content {
@@ -523,11 +523,12 @@ body {
   box-shadow: var(--shadow-clinical-lg);
   width: 100%;
   max-width: 820px;
-  max-height: 90vh;
+  max-height: 88vh;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-medium);
   animation: modalIn 0.15s ease-out;
+  overflow: hidden;
 }
 
 @keyframes modalIn {
@@ -542,6 +543,7 @@ body {
 }
 
 .modal-header {
+  flex-shrink: 0;
   padding: 16px 24px;
   border-bottom: 1px solid var(--border-light);
   display: flex;
@@ -562,10 +564,12 @@ body {
 .modal-body {
   padding: 24px;
   overflow-y: auto;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .modal-footer {
+  flex-shrink: 0;
   padding: 14px 24px;
   border-top: 1px solid var(--border-light);
   display: flex;
@@ -573,6 +577,14 @@ body {
   justify-content: flex-end;
   gap: 12px;
   background: #F8FAFC;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ==========================================================================
