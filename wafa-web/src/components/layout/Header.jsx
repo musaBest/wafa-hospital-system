@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Building2, Calendar, UserCheck, ShieldCheck, LogOut, ChevronDown } from 'lucide-react';
-import { useAuth, DEMO_ACCOUNTS } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 
 export default function Header() {
-  const { user, logout, switchDemoRole } = useAuth();
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const currentDate = new Date().toLocaleDateString('ar-EG', {
     weekday: 'long',
@@ -13,6 +14,22 @@ export default function Header() {
     month: 'long',
     day: 'numeric',
   });
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    setMenuOpen(false);
+    await logout();
+  };
 
   return (
     <header
@@ -28,9 +45,10 @@ export default function Header() {
         top: 0,
         zIndex: 100,
         boxShadow: 'var(--shadow-clinical-sm)',
+        flexShrink: 0,
       }}
     >
-      {/* Hospital Identity Title */}
+      {/* Hospital Identity */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <div
           style={{
@@ -43,6 +61,7 @@ export default function Header() {
             justifyContent: 'center',
             color: '#FFFFFF',
             boxShadow: '0 2px 4px rgba(20, 77, 67, 0.25)',
+            flexShrink: 0,
           }}
         >
           <Building2 size={22} />
@@ -52,16 +71,16 @@ export default function Header() {
             مستشفى الوفاء للتأهيل الطبي والجراحة التخصصية
           </h1>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>غزة - فلسطين</span>
+            <span>غزة — فلسطين</span>
             <span>•</span>
             <span>النظام الطبي والمعلوماتي الموحد</span>
           </p>
         </div>
       </div>
 
-      {/* Right Side Utilities: Date, Notifications, Staff Profile & Role Switcher */}
+      {/* Right: Date, Notifications, User Menu */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Date Display */}
+        {/* Date */}
         <div
           style={{
             display: 'flex',
@@ -79,13 +98,13 @@ export default function Header() {
           <span>{currentDate}</span>
         </div>
 
-        {/* Notifications Dropdown */}
+        {/* Notifications */}
         <NotificationDropdown />
 
-        {/* Staff Profile & Role Switcher Dropdown */}
-        <div style={{ position: 'relative' }}>
+        {/* User Account Menu */}
+        <div ref={menuRef} style={{ position: 'relative' }}>
           <button
-            onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+            onClick={() => setMenuOpen((v) => !v)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -95,18 +114,9 @@ export default function Header() {
               borderRadius: '24px',
               border: '1px solid var(--hospital-pine-border)',
               cursor: 'pointer',
-              textAlign: 'right',
             }}
           >
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--hospital-pine-dark)', lineHeight: '1.2' }}>
-                {user?.name || 'كادر طبي'}
-              </div>
-              <div style={{ fontSize: '11px', color: 'var(--clinical-slate)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <ShieldCheck size={11} />
-                <span>{user?.role_label || user?.role || 'مستخدم'}</span>
-              </div>
-            </div>
+            {/* Avatar circle */}
             <div
               style={{
                 width: '32px',
@@ -117,87 +127,110 @@ export default function Header() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
               <UserCheck size={16} />
             </div>
-            <ChevronDown size={14} style={{ color: 'var(--hospital-pine-dark)' }} />
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--hospital-pine-dark)', lineHeight: '1.2', whiteSpace: 'nowrap' }}>
+                {user?.name?.split(' ')[0] || 'المستخدم'}
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--clinical-slate)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                <ShieldCheck size={11} />
+                <span style={{ whiteSpace: 'nowrap' }}>{user?.role_label || user?.role}</span>
+              </div>
+            </div>
+            <ChevronDown
+              size={14}
+              style={{
+                color: 'var(--hospital-pine-dark)',
+                transform: menuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.15s ease',
+              }}
+            />
           </button>
 
-          {/* Role Switcher Menu */}
-          {showRoleSwitcher && (
+          {/* Dropdown */}
+          {menuOpen && (
             <div
               style={{
                 position: 'absolute',
                 top: 'calc(100% + 8px)',
                 left: 0,
-                width: '300px',
+                minWidth: '240px',
                 backgroundColor: '#FFFFFF',
                 borderRadius: '8px',
                 boxShadow: 'var(--shadow-clinical-lg)',
                 border: '1px solid var(--border-medium)',
                 zIndex: 1100,
-                padding: '8px',
+                overflow: 'hidden',
               }}
             >
-              <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-light)', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>
-                تبديل الدور للتجربة (RBAC Switcher):
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '4px 0' }}>
-                {DEMO_ACCOUNTS.map((acc) => (
-                  <button
-                    key={acc.role}
-                    onClick={() => {
-                      switchDemoRole(acc.email);
-                      setShowRoleSwitcher(false);
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: '4px',
-                      border: 'none',
-                      backgroundColor: user?.role === acc.role ? 'var(--hospital-pine-light)' : 'transparent',
-                      color: user?.role === acc.role ? 'var(--hospital-pine-dark)' : 'var(--text-body)',
-                      fontWeight: user?.role === acc.role ? '700' : '400',
-                      fontSize: '12.5px',
-                      textAlign: 'right',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <span>{acc.label}</span>
-                    {user?.role === acc.role && <span className="badge badge-pine" style={{ fontSize: '10px' }}>الحالي</span>}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '6px', marginTop: '4px' }}>
-                <button
-                  onClick={() => {
-                    logout();
-                    setShowRoleSwitcher(false);
+              {/* User info block — display only */}
+              <div
+                style={{
+                  padding: '14px 16px',
+                  backgroundColor: 'var(--hospital-pine-light)',
+                  borderBottom: '1px solid var(--border-light)',
+                }}
+              >
+                <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--hospital-pine-dark)', marginBottom: '2px' }}>
+                  {user?.name}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--clinical-slate)', marginBottom: '2px' }}>
+                  {user?.email}
+                </div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: 'var(--hospital-pine)',
+                    backgroundColor: '#FFFFFF',
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    border: '1px solid var(--hospital-pine-border)',
+                    marginTop: '4px',
                   }}
+                >
+                  <ShieldCheck size={11} />
+                  <span>{user?.role_label || user?.role}</span>
+                </div>
+                {user?.department && (
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    {user.department}
+                  </div>
+                )}
+              </div>
+
+              {/* Logout action */}
+              <div style={{ padding: '6px' }}>
+                <button
+                  onClick={handleLogout}
                   style={{
                     width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: '4px',
+                    padding: '10px 12px',
+                    borderRadius: '6px',
                     border: 'none',
                     backgroundColor: 'transparent',
                     color: 'var(--surgical-crimson)',
-                    fontSize: '13px',
+                    fontSize: '13.5px',
                     fontWeight: '600',
                     textAlign: 'right',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
+                    transition: 'background-color 0.1s ease',
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--surgical-crimson-bg)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
-                  <LogOut size={15} />
-                  <span>تسجيل الخروج</span>
+                  <LogOut size={16} />
+                  <span>تسجيل الخروج من النظام</span>
                 </button>
               </div>
             </div>

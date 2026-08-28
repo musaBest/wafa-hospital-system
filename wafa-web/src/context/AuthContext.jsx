@@ -3,14 +3,6 @@ import { authApi } from '../services/api';
 
 const AuthContext = createContext(null);
 
-export const DEMO_ACCOUNTS = [
-  { role: 'it_admin', label: 'أحمد IT (مدير النظام)', email: 'admin@wafa.hospital', color: 'pine' },
-  { role: 'accountant', label: 'المحاسب المالي (التحويلات)', email: 'accountant@wafa.hospital', color: 'amber' },
-  { role: 'doctor', label: 'د. كمال النملة (طبيب معالج)', email: 'doctor.kamal@wafa.hospital', color: 'slate' },
-  { role: 'registration_clerk', label: 'كاتب التسجيل وفتح الملفات', email: 'registration@wafa.hospital', color: 'green' },
-  { role: 'data_lookup_clerk', label: 'كاتب الاستعلامات (قراءة فقط)', email: 'lookup@wafa.hospital', color: 'crimson' },
-];
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('wafa_user');
@@ -20,7 +12,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If we have token but no user, fetch me
+    // If we have a token but no user object (e.g. page refresh), re-fetch the profile
     if (token && !user) {
       authApi.me()
         .then((res) => {
@@ -56,10 +48,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const switchDemoRole = async (email) => {
-    return login(email, 'password123');
-  };
-
   const logout = async () => {
     try {
       if (token) {
@@ -73,19 +61,35 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Helper flags
-  const isItAdmin = user?.role === 'it_admin';
-  const isManagementAdmin = user?.role === 'management_admin';
-  const isAccountant = user?.role === 'accountant';
-  const isDoctor = user?.role === 'doctor';
+  // ── Role identity flags ────────────────────────────────────────────────────
+  const isItAdmin          = user?.role === 'it_admin';
+  const isManagementAdmin  = user?.role === 'management_admin';
+  const isAccountant       = user?.role === 'accountant';
+  const isDoctor           = user?.role === 'doctor';
   const isRegistrationClerk = user?.role === 'registration_clerk';
-  const isDataLookupClerk = user?.role === 'data_lookup_clerk';
+  const isDataLookupClerk  = user?.role === 'data_lookup_clerk';
+  const isLabTech          = user?.role === 'lab_technician';
+  const isPtSpecialist     = user?.role === 'pt_specialist';
+  const isRadiologist      = user?.role === 'radiologist';
+  const isSocialWorker     = user?.role === 'social_worker';
 
-  const canAccessTransfers = isAccountant;
-  const canManageStaff = isItAdmin || isManagementAdmin;
-  const canManageSystem = isItAdmin;
-  const canManagePatients = isItAdmin || isManagementAdmin || isRegistrationClerk;
-  const isReadOnly = isDataLookupClerk;
+  // ── Feature-level access flags ─────────────────────────────────────────────
+  // These are the ONLY gates used by Sidebar, components, and App route guards.
+  // Never check role strings directly outside this file.
+  const canAccessTransfers  = isAccountant;
+  const canManageStaff      = isItAdmin || isManagementAdmin;
+  const canManageSystem     = isItAdmin;
+  const canManagePatients   = isItAdmin || isManagementAdmin || isRegistrationClerk;
+  const canViewPatients     = isItAdmin || isManagementAdmin || isRegistrationClerk || isDataLookupClerk || isDoctor;
+  const isReadOnly          = isDataLookupClerk;
+
+  const canAccessClinical   = isManagementAdmin || isDoctor || isItAdmin;
+  const canAccessLab        = isManagementAdmin || isLabTech || isItAdmin;
+  const canAccessPt         = isManagementAdmin || isPtSpecialist || isDoctor || isItAdmin;
+  const canAccessRadiology  = isManagementAdmin || isRadiologist || isItAdmin;
+  const canAccessSocial     = isManagementAdmin || isSocialWorker || isItAdmin;
+  const canAccessInpatient  = isManagementAdmin || isDoctor || isRegistrationClerk || isItAdmin;
+  const canAccessReports    = isManagementAdmin || isItAdmin;
 
   return (
     <AuthContext.Provider
@@ -95,18 +99,31 @@ export function AuthProvider({ children }) {
         loading,
         login,
         logout,
-        switchDemoRole,
+        // Role identity
         isItAdmin,
         isManagementAdmin,
         isAccountant,
         isDoctor,
         isRegistrationClerk,
         isDataLookupClerk,
+        isLabTech,
+        isPtSpecialist,
+        isRadiologist,
+        isSocialWorker,
+        // Feature-level access
         canAccessTransfers,
         canManageStaff,
         canManageSystem,
         canManagePatients,
+        canViewPatients,
         isReadOnly,
+        canAccessClinical,
+        canAccessLab,
+        canAccessPt,
+        canAccessRadiology,
+        canAccessSocial,
+        canAccessInpatient,
+        canAccessReports,
       }}
     >
       {children}

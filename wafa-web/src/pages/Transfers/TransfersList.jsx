@@ -20,7 +20,7 @@ import { transfersApi } from '../../services/api';
 import TransferFormModal from './TransferFormModal';
 
 export default function TransfersList() {
-  const { user, isAccountant, switchDemoRole } = useAuth();
+  const { user, isAccountant } = useAuth();
   const [transfers, setTransfers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -118,21 +118,17 @@ export default function TransfersList() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '12px',
+              gap: '8px',
               backgroundColor: 'var(--bg-parchment)',
-              padding: '12px 20px',
+              padding: '10px 16px',
               borderRadius: '8px',
               border: '1px solid var(--border-light)',
+              fontSize: '13px',
+              color: 'var(--text-muted)',
             }}
           >
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>لتجربة هذه الوحدة بصفتك محاسباً:</span>
-            <button
-              onClick={() => switchDemoRole('accountant@wafa.hospital')}
-              className="btn btn-primary btn-sm"
-            >
-              <UserCheck size={14} />
-              <span>التبديل إلى حساب المحاسب المالي</span>
-            </button>
+            <ShieldAlert size={15} style={{ color: 'var(--surgical-crimson)' }} />
+            <span>يرجى تسجيل الدخول بحساب المحاسب المالي للوصول إلى هذه الوحدة.</span>
           </div>
         </div>
       </div>
@@ -447,12 +443,29 @@ export default function TransfersList() {
                 {selectedReceipt.payment_method === 'digital_transfer' && (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>اسم المحول:</span>
+                      <span style={{ color: 'var(--text-muted)' }}>اسم المحول / الجهة:</span>
                       <strong>{selectedReceipt.sender_name}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>رقم المرجع / الحوالة:</span>
-                      <span className="num-tabular">{selectedReceipt.reference_number}</span>
+                      <span style={{ color: 'var(--text-muted)' }}>جهة التحويل / البنك:</span>
+                      <span
+                        style={{
+                          fontWeight: '700',
+                          color: 'var(--clinical-slate-dark)',
+                          backgroundColor: 'var(--hospital-pine-light)',
+                          padding: '1px 8px',
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                        }}
+                      >
+                        {selectedReceipt.transfer_platform || '—'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>رقم مرجع الحوالة:</span>
+                      <span className="num-tabular" style={{ fontWeight: '600' }}>
+                        {selectedReceipt.reference_number}
+                      </span>
                     </div>
                   </>
                 )}
