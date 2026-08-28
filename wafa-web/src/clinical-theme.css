@@ -1,0 +1,668 @@
+/* ==========================================================================
+   EL-WAFA HOSPITAL INFORMATION SYSTEM — CLINICAL DESIGN SYSTEM
+   Visual Identity: Hospital Pine, Clinical Slate, Sterile White, Restrained Accents
+   ========================================================================== */
+
+:root {
+  /* Core Clinical Palette */
+  --hospital-pine: #144D43;
+  --hospital-pine-dark: #0E3831;
+  --hospital-pine-light: #E9F4F2;
+  --hospital-pine-border: #80B5AC;
+
+  --clinical-slate: #334E68;
+  --clinical-slate-dark: #1E293B;
+  --clinical-slate-light: #F0F4F8;
+  --clinical-slate-border: #CBD5E1;
+
+  --bg-parchment: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+
+  --triage-amber: #B7791F;
+  --triage-amber-bg: #FEF3C7;
+  --triage-amber-border: #F59E0B;
+
+  --surgical-crimson: #9B2C2C;
+  --surgical-crimson-bg: #FEE2E2;
+  --surgical-crimson-border: #EF4444;
+
+  --clinical-green: #22543D;
+  --clinical-green-bg: #DEF7EC;
+  --clinical-green-border: #31C48D;
+
+  --text-main: #0F172A;
+  --text-body: #334155;
+  --text-muted: #64748B;
+  --text-inverse: #FFFFFF;
+
+  --border-light: #E2E8F0;
+  --border-medium: #CBD5E1;
+  --border-dark: #94A3B8;
+
+  /* Typography */
+  --font-arabic: 'Readex Pro', 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Layout Dimensions */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 72px;
+  --header-height: 64px;
+
+  /* Shadows (Restrained, Crisp) */
+  --shadow-clinical-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-clinical-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-clinical-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-arabic);
+  background-color: var(--bg-parchment);
+  color: var(--text-body);
+  direction: rtl;
+  text-align: right;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular figures for numbers */
+.num-tabular,
+.badge-id,
+.table-data-num {
+  font-family: var(--font-mono), var(--font-arabic);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   LAYOUT STRUCTURE
+   ========================================================================== */
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-parchment);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: margin-right 0.2s ease;
+}
+
+.main-body {
+  flex: 1;
+  padding: 24px 32px 40px;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   SIGNATURE ELEMENT: THE MEDICAL FILE TAB
+   ========================================================================== */
+
+.medical-file-tab {
+  position: relative;
+  overflow: hidden;
+}
+
+.medical-file-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 4px;
+  background-color: var(--hospital-pine);
+  border-radius: 0 4px 4px 0;
+}
+
+.medical-file-tab.tab-amber::before {
+  background-color: var(--triage-amber);
+}
+
+.medical-file-tab.tab-crimson::before {
+  background-color: var(--surgical-crimson);
+}
+
+.medical-file-tab.tab-slate::before {
+  background-color: var(--clinical-slate);
+}
+
+/* ==========================================================================
+   BUTTONS & ACTIONS
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-arabic);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn-primary {
+  background-color: var(--hospital-pine);
+  color: var(--text-inverse);
+  border-color: var(--hospital-pine-dark);
+}
+
+.btn-primary:hover {
+  background-color: var(--hospital-pine-dark);
+}
+
+.btn-secondary {
+  background-color: var(--bg-surface);
+  color: var(--clinical-slate);
+  border-color: var(--border-medium);
+}
+
+.btn-secondary:hover {
+  background-color: var(--clinical-slate-light);
+  border-color: var(--clinical-slate);
+}
+
+.btn-outline-pine {
+  background-color: transparent;
+  color: var(--hospital-pine);
+  border-color: var(--hospital-pine);
+}
+
+.btn-outline-pine:hover {
+  background-color: var(--hospital-pine-light);
+}
+
+.btn-danger {
+  background-color: var(--surgical-crimson);
+  color: var(--text-inverse);
+  border-color: var(--surgical-crimson);
+}
+
+.btn-danger:hover {
+  background-color: #822424;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+  padding: 6px 10px;
+}
+
+.btn-ghost:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.btn-icon {
+  padding: 7px;
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  color: var(--text-body);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-icon:hover {
+  background: var(--bg-subtle);
+  color: var(--hospital-pine);
+}
+
+/* ==========================================================================
+   CARDS & CONTAINERS
+   ========================================================================== */
+
+.clinical-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: var(--shadow-clinical-sm);
+  overflow: hidden;
+}
+
+.clinical-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #FAFCFD;
+}
+
+.clinical-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--clinical-slate-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clinical-card-body {
+  padding: 20px;
+}
+
+/* ==========================================================================
+   STAT CARDS RIBBON
+   ========================================================================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-clinical-sm);
+}
+
+.stat-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--hospital-pine-light);
+  color: var(--hospital-pine);
+}
+
+.stat-icon-wrapper.amber {
+  background-color: var(--triage-amber-bg);
+  color: var(--triage-amber);
+}
+
+.stat-icon-wrapper.slate {
+  background-color: var(--clinical-slate-light);
+  color: var(--clinical-slate);
+}
+
+.stat-icon-wrapper.crimson {
+  background-color: var(--surgical-crimson-bg);
+  color: var(--surgical-crimson);
+}
+
+.stat-content .stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-content .stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: var(--font-mono), var(--font-arabic);
+}
+
+/* ==========================================================================
+   CLINICAL DATA TABLE
+   ========================================================================== */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-clinical-sm);
+}
+
+.clinical-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  font-size: 14px;
+}
+
+.clinical-table th {
+  background-color: #F1F5F9;
+  color: var(--clinical-slate);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-medium);
+  white-space: nowrap;
+}
+
+.clinical-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-body);
+  vertical-align: middle;
+}
+
+.clinical-table tbody tr {
+  transition: background-color 0.1s ease;
+}
+
+.clinical-table tbody tr:hover {
+  background-color: #F8FAFD;
+}
+
+.clinical-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   BADGES & PILLS
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.badge-pine {
+  background-color: var(--hospital-pine-light);
+  color: var(--hospital-pine-dark);
+  border: 1px solid var(--hospital-pine-border);
+}
+
+.badge-slate {
+  background-color: var(--clinical-slate-light);
+  color: var(--clinical-slate);
+  border: 1px solid var(--clinical-slate-border);
+}
+
+.badge-amber {
+  background-color: var(--triage-amber-bg);
+  color: var(--triage-amber);
+  border: 1px solid var(--triage-amber-border);
+}
+
+.badge-crimson {
+  background-color: var(--surgical-crimson-bg);
+  color: var(--surgical-crimson);
+  border: 1px solid var(--surgical-crimson-border);
+}
+
+.badge-green {
+  background-color: var(--clinical-green-bg);
+  color: var(--clinical-green);
+  border: 1px solid var(--clinical-green-border);
+}
+
+/* ==========================================================================
+   FORMS & INPUTS
+   ========================================================================== */
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--clinical-slate-dark);
+  margin-bottom: 6px;
+}
+
+.form-label .required-star {
+  color: var(--surgical-crimson);
+  margin-right: 2px;
+}
+
+.form-control,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font-family: var(--font-arabic);
+  font-size: 14px;
+  color: var(--text-main);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--hospital-pine);
+  box-shadow: 0 0 0 3px rgba(20, 77, 67, 0.12);
+}
+
+.form-control.error,
+.form-select.error,
+.form-textarea.error {
+  border-color: var(--surgical-crimson);
+  background-color: #FFFDFD;
+}
+
+.form-error-msg {
+  font-size: 12px;
+  color: var(--surgical-crimson);
+  margin-top: 4px;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.form-section-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hospital-pine-dark);
+  padding: 8px 12px;
+  background-color: var(--hospital-pine-light);
+  border-radius: 4px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   MODAL & DRAWER
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-clinical-lg);
+  width: 100%;
+  max-width: 820px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-medium);
+  animation: modalIn 0.15s ease-out;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F8FAFC;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--hospital-pine-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #F8FAFC;
+}
+
+/* ==========================================================================
+   ALERT BANNER
+   ========================================================================== */
+
+.alert-banner {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.alert-pine {
+  background-color: var(--hospital-pine-light);
+  color: var(--hospital-pine-dark);
+  border: 1px solid var(--hospital-pine-border);
+}
+
+.alert-amber {
+  background-color: var(--triage-amber-bg);
+  color: var(--triage-amber);
+  border: 1px solid var(--triage-amber-border);
+}
+
+.alert-crimson {
+  background-color: var(--surgical-crimson-bg);
+  color: var(--surgical-crimson);
+  border: 1px solid var(--surgical-crimson-border);
+}
+
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-surface);
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-num-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  color: var(--text-body);
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-num-btn.active {
+  background: var(--hospital-pine);
+  color: #FFFFFF;
+  border-color: var(--hospital-pine-dark);
+}
+
+/* ==========================================================================
+   RESPONSIVE UTILITIES
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .main-body {
+    padding: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    margin: 10px;
+    max-height: 95vh;
+  }
+}
