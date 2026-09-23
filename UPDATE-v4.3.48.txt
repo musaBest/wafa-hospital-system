@@ -1,0 +1,16 @@
+Wafaa Hospital System v4.3.48
+
+Fixes:
+- Restored visibility/access for all newer departments by synchronizing the full permission catalog.
+- Restored Outpatient Physical Therapy permissions and bundled database tables.
+- Bundled SQLite databases now include all migrations through 2026_09_11_130000.
+- Restored inpatient specialty permissions/modules: rehabilitation, social/psychological service, inpatient physical therapy, inpatient finance, and Ministry of Health portal.
+- Added an additive permission-catalog migration for existing installations.
+- Added lightweight login-time stale-catalog detection: normal logins only perform cheap checks; bulk sync runs only when an older database is detected.
+- Preserved v4.3.47 bcrypt compatibility fix and v4.3.46 performance improvements.
+- Local backend remains fixed at 127.0.0.1:18088.
+
+Important upgrade command for an existing database:
+  php artisan migrate
+
+Fresh copies already include an upgraded bundled SQLite database.

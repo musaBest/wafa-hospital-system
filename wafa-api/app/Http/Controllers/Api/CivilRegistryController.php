@@ -3,48 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\CivilRegistry\CivilRegistryLookupServiceInterface;
-use Illuminate\Http\JsonResponse;
+use App\Services\AuditService;
+use App\Services\CivilRegistryService;
 use Illuminate\Http\Request;
+use Throwable;
 
 class CivilRegistryController extends Controller
 {
-    protected CivilRegistryLookupServiceInterface $civilRegistryService;
-
-    public function __construct(CivilRegistryLookupServiceInterface $civilRegistryService)
+    public function __invoke(Request $request, CivilRegistryService $registry, AuditService $audit)
     {
-        $this->civilRegistryService = $civilRegistryService;
-    }
-
-    /**
-     * Look up Palestinian citizen record by national ID.
-     */
-    public function lookup(Request $request, string $nationalId): JsonResponse
-    {
-        $cleanId = trim($nationalId);
-
-        if (!preg_match('/^\d{9}$/', $cleanId)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'رقم الهوية الفلسطينية يجب أن يتكون من 9 أرقام بالضبط',
-            ], 422);
+        $data=$request->validate(['query'=>'required|string|min:2|max:150']);
+        try {
+            $record=$registry->lookup($data['query']);
+            $audit->record($request,'civil_registry.lookup','civil_registry',null,['query_hash'=>hash('sha256',$data['query']),'success'=>true]);
+            return response()->json(['success'=>true,'data'=>$record]);
+        } catch(Throwable $error) {
+            report($error);
+            $audit->record($request,'civil_registry.lookup','civil_registry',null,['query_hash'=>hash('sha256',$data['query']),'success'=>false]);
+            return response()->json(['success'=>false,'code'=>'CIVIL_REGISTRY_LOOKUP_FAILED','message'=>'Civil Registry lookup failed.'],502);
         }
-
-        $record = $this->civilRegistryService->lookupByNationalId($cleanId);
-
-        if (!$record) {
-            return response()->json([
-                'success' => false,
-                'found' => false,
-                'message' => 'لم يتم العثور على سجل مسبق برقم الهوية في قاعدة بيانات السجل المدني. يرجى إدخال البيانات يدوياً.',
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'found' => true,
-            'message' => 'تم استرجاع بيانات المواطن من السجل المدني بنجاح',
-            'data' => $record,
-        ]);
     }
 }

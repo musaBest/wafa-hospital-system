@@ -1,0 +1,10 @@
+Wafaa Hospital System v4.3.44
+================================
+Login performance optimization
+
+- Removed the full permission-catalog synchronization from the normal login request.
+- Login no longer performs dozens/hundreds of SQLite permission writes before authenticating the user.
+- Added an indexed exact-username lookup as the normal fast path while preserving case-insensitive compatibility as a fallback.
+- Avoided reloading the doctor relation twice while building the authenticated user response.
+- Kept the emergency built-in-account recovery path, but changed its permission synchronization to bulk UPSERT/insert-or-ignore operations instead of row-by-row writes.
+- No database migration is required for this update.

@@ -1,0 +1,14 @@
+Wafaa Hospital System v4.3.50
+
+Inpatient workflow and document-output update:
+- Rebuilt the inpatient operations screen around the legacy workflow: current patients, MOH admissions/discharges, all discharges, missing referrals, renewals, claims, patient accounts, financial statements and debts.
+- Every inpatient operation supports date-from/date-to filtering and a complete results table below the action panel.
+- Added official MOH health-case report preview/export with male/female sections, blue admission dates and red discharge dates; discharge date is manually entered by the responsible employee.
+- Added Financial Declaration File with only: name, date, year, nightly amount and total amount.
+- PDF / Word / Print output for the declaration follows the supplied Wafaa Hospital acknowledgement template.
+- Fixed blank print-preview behavior by replacing direct window.print workflows and scoping the old inpatient print CSS.
+- Removed translucent ghosting/shadow behind topbar icons and text; topbar/dock are now opaque and crisp.
+- Hid the global clock/date while inside the inpatient route.
+- Preserves all departments and v4.3.49 outpatient/inpatient physical-therapy work.
+
+No database migration is required for this update. Inpatient declaration history is stored in the existing browser-side application storage.

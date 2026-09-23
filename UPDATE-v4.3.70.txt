@@ -1,0 +1,15 @@
+WAFA Hospital System v4.3.70
+
+Hotfix: registration/payment/doctor queue data persistence and linking.
+
+Changes:
+- Doctor queue now receives the paid case immediately after payment confirmation and remains visible after refresh.
+- The backend repairs/creates missing visit and queue rows from the central cashier workflow if an older browser/local cache interrupted the sync.
+- Registration desk has a persistent "آخر الزيارات المسجلة" list loaded from the backend database, so newly registered visits do not disappear after refreshing the page.
+- Registration workflow is bridged to the central cashier workflow for any visits.create user, not only a locally cached cashier session.
+- Doctor portal accepts workflow statuses: paid, collected, audited.
+
+Run after extracting:
+cd wafa-api
+php artisan migrate --force
+php artisan optimize:clear

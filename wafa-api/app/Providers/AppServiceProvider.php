@@ -2,28 +2,10 @@
 
 namespace App\Providers;
 
-use App\Services\CivilRegistry\CivilRegistryLookupServiceInterface;
-use App\Services\CivilRegistry\MockCivilRegistryLookupService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        $this->app->bind(
-            CivilRegistryLookupServiceInterface::class,
-            MockCivilRegistryLookupService::class
-        );
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        //
-    }
+    public function register(): void {}
+    public function boot(): void {}
 }

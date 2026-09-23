@@ -1,0 +1,9 @@
+WAFAA Hospital System v4.3.10
+
+Fix: Patient profile -> Register Visit
+1) Fixed the case where clicking Register Visit dimmed the page but the clinic-selection dialog did not appear.
+2) Modal is now mounted at document.body using React Portal and uses a stable visible surface.
+3) Clinic/doctor selection remains linked and shows a clear warning when configuration is missing.
+4) No database migration is required.
+
+Version: 4.3.10

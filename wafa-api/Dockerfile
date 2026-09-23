@@ -1,22 +1,27 @@
-FROM php:8.2-cli
+FROM php:8.2-cli-alpine
 
-# تثبيت الإضافات والمسارعات المطلوبة لتشغيل لارافيل وقاعدة البيانات
-RUN apt-get update && apt-get install -y \
-    libzip-dev zip unzip git libpng-dev libjpeg-dev libfreetype6-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
+WORKDIR /var/www/html
 
-# تحميل وتثبيت الـ Composer داخل السيرفر تلقائياً
+RUN apk add --no-cache \
+    git \
+    curl \
+    libpng-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    sqlite \
+    sqlite-dev \
+    mariadb-connector-c-dev
+
+RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring bcmath
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# تحديد مجلد العمل داخل السيرفر
-WORKDIR /app
 COPY . .
 
-# تثبيت مكتبات اللارافيل المتواجدة في composer.json
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-# فتح المنفذ الذي يطلبه موقع Render
-EXPOSE 10000
+EXPOSE 8000
 
-# أمر تشغيل سيرفر لارافيل الداخلي عند بدء الخدمة
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]

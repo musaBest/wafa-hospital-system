@@ -1,0 +1,14 @@
+Wafaa Hospital System v4.3.51
+
+Inpatient workflow polish and export stability:
+- Fixed the white/blank screen effect that could remain behind export or print operations by isolating print iframe cleanup and removing heavy modal blur.
+- Export modals now close cleanly after successful file generation instead of leaving the page dimmed.
+- Added Excel export to the official MOH health-case report alongside PDF, Word and Print.
+- Added PDF / Word / Excel export for all inpatient operation tables: current patients, MOH admission/discharge, all discharge, missing referrals, renewals, claims, accounts, statements and debts.
+- Made the inpatient operation icons data-entry actions, not only filters: discharge dates, referral/renewal data, notes, payments, discounts and financial help can be entered from the same workflow.
+- Simplified payment/discount/help calculation into one amount field with live NET calculation before saving.
+- Improved the financial declaration preview so the A4 page remains straight, centered and visually consistent with export output.
+- Fixed overlapping declaration action icons/buttons and tightened spacing in the inpatient financial declaration screen.
+- Removed remaining ghost/shadow effects from icons, buttons, topbar and inpatient panels for clearer text.
+
+No database migration is required for this update.

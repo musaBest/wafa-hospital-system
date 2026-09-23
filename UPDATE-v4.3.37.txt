@@ -1,0 +1,7 @@
+Wafa Hospital System v4.3.37
+
+- Fixed the inpatient rehab renewal report referral number column color so the selected color applies to the entire column, not alternating cells or only the number text.
+- Applied the selected referral number column color consistently in the on-screen preview, PDF export, Word export, and the editable referral number input field.
+- Added automatic readable text color for dark/light custom colors.
+- Prevented zebra-row styles and legacy fixed yellow rules from overriding the selected referral column color.
+- No database migration or seeder changes.

@@ -1,0 +1,10 @@
+WAFA Hospital System v4.3.74
+
+- Added Archive department read-only interface.
+- Shows discharged patients immediately after final hospital discharge.
+- Combines discharged inpatient admissions and operation cases with discharge date.
+- Added archive search by patient name, national ID, medical file number, phone, doctor, department, diagnosis.
+- Added elegant A4 PDF export for archive records with hospital logo and complete patient/case details.
+- Added archive-only user:
+  Username: archive
+  Password: Archive@2026

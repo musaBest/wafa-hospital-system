@@ -1,0 +1,12 @@
+Wafaa Hospital System v4.3.80
+
+Root fix for white screen / white overlay during report generation:
+- Moved all generated report HTML/CSS into a same-origin hidden iframe instead of injecting <style> tags into the live app page.
+- Prevented report CSS rules like html/body background:white from affecting the visible workspace.
+- Added a capture guard for html2canvas containers so they never cover the main screen.
+- Kept inpatient operations report buttons visually stable: clicking PDF/Word/Excel no longer changes the button labels to "جارٍ التصدير...".
+- Preserved all v4.3.79 and previous features.
+
+Verification:
+- TypeScript/TSX syntax transpile check for modified files: OK.
+- PHP syntax check: OK.

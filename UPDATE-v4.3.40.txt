@@ -1,0 +1,9 @@
+Wafa Hospital System v4.3.40
+
+- Improved inpatient internal physical therapy report template for clearer PDF/Word output.
+- Added full therapist/nurse management: add by national ID, edit, delete/archive, phone and extra fields.
+- Added coverage entity as a single-select report filter.
+- Added default physiotherapy diagnosis catalog with single-selection per patient and 'Other' prompt for custom case diagnosis.
+- Improved PT diagnosis catalog UI and therapist cards.
+
+No backend migration or seeder changes.

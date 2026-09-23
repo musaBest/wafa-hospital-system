@@ -1,0 +1,6 @@
+Wafaa Hospital System v4.3.25
+
+- Root fix for RTL sidebar hover jitter on Windows/Chrome.
+- Sidebar keeps scrolling but its native scrollbar is visually hidden, preventing hover-driven width/repaint shifts.
+- Sidebar geometry, icon transforms, and width/margin transitions are frozen.
+- No database migration or seeder changes.

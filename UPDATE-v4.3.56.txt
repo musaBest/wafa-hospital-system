@@ -1,0 +1,7 @@
+# v4.3.56
+- Corrected health report doctor name to د. سامي عويمر.
+- Added merged health report option for دخول صحة / خروج صحة / خروج جميع الحالات with user-selectable sections.
+- Improved health report table widths to prevent overlapping numbers/dates in preview, print, PDF, Word, and Excel.
+- Added visible sidebar scrollbar.
+- Standardized engineer monitoring times to 12-hour format with clear AM/PM Arabic labels and correct duration formatting.
+- Added final report typography/needs numbering/table-line UI fixes.

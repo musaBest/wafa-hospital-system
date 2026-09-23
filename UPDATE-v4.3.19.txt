@@ -1,0 +1,5 @@
+Wafaa Hospital System v4.3.19
+
+- Hotfix: restore/recover built-in login accounts when default credentials are used.
+- Hotfix: db:seed now refreshes only login-critical fields for built-in accounts without deleting customized permissions.
+- This fixes failed login after upgrading when an older SQLite database has a stale/corrupted Eng.Mohammed password.

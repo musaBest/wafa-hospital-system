@@ -1,0 +1,14 @@
+WAFAA Hospital System v4.3.9
+
+Changes:
+1) Added Light/Dark mode toggle directly to the login screen.
+   - Theme persists via the existing wafa_theme preference.
+   - Improved login text/placeholder contrast in both modes.
+
+2) Fixed patient-file visit registration flow.
+   - Visit dialog now lists outpatient/mixed clinics only.
+   - Doctors are filtered by the selected clinic and the first valid doctor is selected automatically.
+   - New patients with zero wallet balance can be registered for a clinic visit; the wallet debit is recorded consistently with the Laravel backend behavior.
+   - Added validation that the selected doctor belongs to the selected clinic.
+
+Version: 4.3.9

@@ -1,0 +1,6 @@
+WAFA Hospital System v4.3.76 - Dental build fix
+
+- Fixed React/TypeScript build errors reported during Windows setup.
+- Aligned registerVisit/bookFollowUp context signatures with their synchronous local-storage implementation.
+- Replaced String.replaceAll usages with compatible replace(/-/g, '/') calls for the current tsconfig target.
+- No database reset required; run 01-SETUP-WINDOWS.bat again, then 02-START-FULL-STACK.bat.

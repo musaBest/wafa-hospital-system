@@ -1,0 +1,861 @@
+/* =========================================================================
+   WAFAA HIS — نظام التصميم v4.4.0
+   طبقة واحدة تُحمّل أخيراً وتحكم كل الواجهات: الخط، المقاييس، الأسطح،
+   الحدود، الزوايا، الظل، وحالات التفاعل.
+   المبدأ: قرار واحد لكل شيء، فترث كل الشاشات نفس النظام بلا استثناءات.
+   ========================================================================= */
+
+:root {
+  /* ---- المقياس الطباعي: نسبة ثابتة بدل أرقام عشوائية ---- */
+  --t-2xs: 10px;
+  --t-xs: 11px;
+  --t-sm: 12px;
+  --t-base: 13px;
+  --t-md: 14px;
+  --t-lg: 16px;
+  --t-xl: 20px;
+  --t-2xl: 26px;
+  --t-3xl: 32px;
+
+  /* ---- مقياس المسافات: مضاعفات 4 ---- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px;
+
+  /* ---- الزوايا: ثلاث درجات فقط ---- */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+
+  /* ---- الظل: درجتان فقط، خفيفتان ---- */
+  --sh-1: 0 1px 2px rgba(0, 0, 0, .18);
+  --sh-2: 0 12px 32px rgba(0, 0, 0, .26);
+
+  --font-ui: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, system-ui, sans-serif;
+  --font-num: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+
+/* =========================================================================
+   1) الخط — أكبر فارق في إحساس الواجهة
+   ========================================================================= */
+
+html, body, button, input, select, textarea, table, .content, .dock, .topbar {
+  font-family: var(--font-ui) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+body { font-size: var(--t-base); line-height: 1.7; letter-spacing: 0; }
+
+/* الأرقام واللاتيني: خط مستقل بعرض ثابت حتى لا تهتز الجداول */
+.stat-num, .clock-chip b, td[dir='ltr'], .lxc-live b, .kpi-value, .money,
+input[type='number'], input[type='date'], input[type='time'] {
+  font-family: var(--font-num) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+
+/* =========================================================================
+   2) الهرم الطباعي — وزن ومقاس محسوبان لكل مستوى
+   ========================================================================= */
+
+.page-head h1 {
+  font-size: clamp(var(--t-2xl), 2.1vw, var(--t-3xl)) !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -.02em !important;
+}
+.page-head p { font-size: var(--t-base) !important; line-height: 1.8 !important; font-weight: 400 !important; }
+.crumb { font-size: var(--t-xs) !important; font-weight: 600 !important; letter-spacing: .02em !important; }
+
+.panel-head h3, .panel-title b, .finance-report-section-head b {
+  font-size: var(--t-md) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+}
+.panel-head span, .panel-head small, .panel-title span { font-size: var(--t-sm) !important; font-weight: 400 !important; }
+
+h2 { font-size: var(--t-xl) !important; font-weight: 700 !important; letter-spacing: -.015em; }
+h4, h5 { font-size: var(--t-base) !important; font-weight: 600 !important; }
+
+.stat-num { font-size: clamp(var(--t-2xl), 2vw, 30px) !important; font-weight: 600 !important; }
+.stat-card > span, .stat-card small { font-size: var(--t-sm) !important; font-weight: 400 !important; }
+
+table { font-size: var(--t-sm) !important; }
+thead th { font-size: var(--t-xs) !important; font-weight: 600 !important; letter-spacing: .03em !important; text-transform: none; }
+tbody td { font-weight: 400 !important; line-height: 1.7 !important; }
+tbody td b, tbody td strong { font-weight: 600 !important; }
+
+.field > span, .lxc-field > span { font-size: var(--t-xs) !important; font-weight: 600 !important; letter-spacing: .01em !important; text-transform: none !important; }
+.field input, .field select, .field textarea { font-size: var(--t-base) !important; font-weight: 400 !important; }
+.btn { font-size: var(--t-sm) !important; font-weight: 600 !important; letter-spacing: 0 !important; }
+.badge, .status-pill { font-size: var(--t-2xs) !important; font-weight: 600 !important; letter-spacing: .01em !important; }
+.dock-item span { font-size: var(--t-sm) !important; font-weight: 500 !important; }
+.dock-item.active span { font-weight: 600 !important; }
+
+/* =========================================================================
+   3) الأسطح — طبقات صلبة بخطوط شعرية بدل زجاج في كل مكان
+   ========================================================================= */
+
+.panel, .stat-card, .kanban-col, .doctor-card, .clinic-card,
+.registration-card, .moh-registry-card, .report-section,
+.finance-report-section, .social-form-section, .rehab-editor-panel,
+.legacy-inpatient-filter-panel, .legacy-action-editor-panel,
+.legacy-inpatient-table-panel, .pt-case-card, .pt-cases-table-panel {
+  border-radius: var(--r-lg) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--sh-1) !important;
+  background: var(--surface) !important;
+}
+html[data-theme='light'] .panel, html[data-theme='pearl'] .panel,
+html[data-theme='light'] .stat-card, html[data-theme='pearl'] .stat-card { background: #fff !important; }
+
+.panel-head, .panel-title, .finance-report-section-head {
+  padding-bottom: var(--s-3) !important;
+  margin-bottom: var(--s-4) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* الحقول والأزرار والشارات: زوايا موحّدة */
+.field input, .field select, .field textarea, .table-search, .search-trigger,
+.input-with-icon, .dock-filter { border-radius: var(--r-sm) !important; }
+.btn { border-radius: var(--r-sm) !important; height: 40px; padding: 0 var(--s-4) !important; }
+.btn-lg { height: 46px; }
+.badge, .status-pill, .chip { border-radius: 999px !important; padding: 4px 10px !important; }
+.modal, .cmdk-box, .account-popover, .notification-popover { border-radius: var(--r-lg) !important; box-shadow: var(--sh-2) !important; }
+
+/* =========================================================================
+   4) الجداول — قراءة أسهل: صفوف أوسع، خطوط أخف، رأس هادئ
+   ========================================================================= */
+
+thead th {
+  padding: var(--s-3) var(--s-4) !important;
+  color: var(--muted) !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border-strong) !important;
+}
+tbody td { padding: var(--s-3) var(--s-4) !important; border-bottom: 1px solid var(--border) !important; }
+tbody tr:last-child td { border-bottom: 0 !important; }
+tbody tr { transition: background-color .14s var(--wx-swift) !important; }
+tbody tr:hover { background: rgba(var(--cyan-rgb), .045) !important; }
+.table-wrap { border-radius: var(--r-md) !important; border: 1px solid var(--border) !important; }
+
+/* =========================================================================
+   5) حالات التفاعل — واضحة ومتسقة في كل النظام
+   ========================================================================= */
+
+.btn:focus-visible, .icon-btn:focus-visible, .dock-item:focus-visible,
+.chip:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--cyan) !important;
+  outline-offset: 2px !important;
+}
+.btn:disabled, input:disabled, select:disabled, textarea:disabled { opacity: .5 !important; cursor: not-allowed; }
+
+.btn-ghost, .btn-soft {
+  background: transparent !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--ink-soft) !important;
+}
+.btn-ghost:hover, .btn-soft:hover {
+  background: var(--input) !important;
+  border-color: rgba(var(--cyan-rgb), .4) !important;
+  color: var(--ink) !important;
+}
+
+/* =========================================================================
+   6) الإيقاع — مسافات موحّدة بين أقسام الصفحة
+   ========================================================================= */
+
+.content > .page-transition > * + * { margin-top: var(--s-5); }
+.page-head { margin-bottom: var(--s-6) !important; }
+.panel { padding: var(--s-5) !important; }
+.stat-grid, .archive-stats, .two-col { gap: var(--s-4) !important; }
+.field { gap: var(--s-2) !important; }
+form .field + .field { margin-top: var(--s-3); }
+
+/* =========================================================================
+   7) الحالات الفارغة — أهدأ وأوضح
+   ========================================================================= */
+
+.empty-state, .empty { padding: var(--s-10) var(--s-5) !important; }
+.empty-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: var(--r-md) !important;
+  background: var(--input) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--muted) !important;
+}
+.empty-state b, .empty b { font-size: var(--t-md) !important; font-weight: 600 !important; }
+.empty-state span, .empty span, .empty-state small { font-size: var(--t-sm) !important; color: var(--muted) !important; }
+
+/* =========================================================================
+   8) حركة مرتبطة بفعل المستخدم
+   ========================================================================= */
+
+.btn, .chip, .icon-btn, .dock-item, .stat-card, .kanban-card, .doctor-card {
+  transition:
+    background-color .16s var(--wx-swift),
+    border-color .16s var(--wx-swift),
+    color .16s var(--wx-swift),
+    transform .2s var(--wx-spring),
+    box-shadow .2s var(--wx-swift) !important;
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0) scale(.98) !important; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2) !important; }
+
+/* التبويبات: مؤشر ينزلق تحت التبويب النشط */
+.tab-btn, .rehab-section-tabs button, .finance-section-tabs button {
+  position: relative;
+  border-radius: var(--r-sm) !important;
+  transition: color .16s var(--wx-swift), background-color .16s var(--wx-swift) !important;
+}
+.tab-btn::after, .rehab-section-tabs button::after, .finance-section-tabs button::after {
+  content: '';
+  position: absolute;
+  inset-inline: 22%;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--cyan);
+  opacity: 0;
+  transform: scaleX(.4);
+  transition: opacity .2s var(--wx-swift), transform .26s var(--wx-spring);
+}
+.tab-btn.active::after, .rehab-section-tabs button.active::after, .finance-section-tabs button.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover, .stat-card:hover { transform: none !important; }
+}
+
+/* =========================================================================
+   9) الطباعة الورقية — بلا زخرفة
+   ========================================================================= */
+
+@media print {
+  body { font-family: var(--font-ui) !important; }
+  .panel, .stat-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+}
+
+/* =========================================================================
+   v4.4.1 — حدّ أدنى لقابلية القراءة عبر كل الواجهات
+   الفحص أظهر 129 قاعدة نص على الشاشة بمقاس أقل من 10px، منها 11 قاعدة بـ8px.
+   النص العربي عند هذا المقاس غير مقروء عملياً: حروفه أكثر تعقيداً من اللاتيني
+   ويحتاج مقاساً أكبر عند نفس النقطة. وهذه النصوص ليست هامشية — هي التسميات
+   الثانوية التي تحمل السياق داخل الجداول والنماذج والبطاقات في كل الشاشات.
+   رُفعت كلها إلى حدّ أدنى مقروء، مع استثناء قوالب المستندات المطبوعة التي
+   تخضع لمقاسات ورقية ثابتة.
+   ========================================================================= */
+
+.account-lines-editor th,
+.dashboard-module small,
+.declaration-history span,
+.declaration-patient-results button span,
+.finance-age-stats em,
+.finance-case-strip small,.finance-case-strip span,
+.finance-check-grid label,
+.finance-claim-dates span,
+.finance-claim-kpis small,.finance-claim-kpis span,
+.finance-claim-patient span,
+.finance-custom-list b,
+.finance-custom-list em,
+.finance-history-list span,.finance-history-list small,.finance-history-list em,
+.finance-linked-patient span,
+.finance-mini-list small,
+.finance-patient-results small,
+.finance-report-filters span,
+.finance-report-section-head button,
+.finance-report-section-head span,
+.finance-rules label,
+.finance-rules label em,
+.finance-rules-head span,
+.finance-section-tabs small,
+.finance-stat-grid span,.finance-stat-grid small,
+.finance-table,
+.finance-warning span,
+.inpatient-registry-grid small,.inpatient-case-grid small,
+.legacy-inpatient-actions small,
+.legacy-inpatient-table .patient-link small,
+.moh-current-list small,
+.moh-hero-mark span,
+.moh-wait-list span,.moh-wait-list small,
+.rehab-day-followups small,
+.rehab-follow-case-list small,.rehab-follow-case-list em,
+.rehab-format-grid span,
+.rehab-history-list small,
+.rehab-saved-meta small,
+.social-hero-mark span,
+.social-history-list em,
+.social-history-list small,
+.social-personal-strip small,
+.theme-choice small {
+  font-size: 10.5px !important;
+  line-height: 1.6 !important;
+}
+
+.account-edit-grid span,
+.account-lines-editor input,
+.account-username span,
+.bar-item span,
+.clinic-fee-row span,
+.declaration-form-grid label span,
+.delete-confirm,
+.delete-warning span,
+.department-permission-grid small,
+.diagnostic-test-builder-head span,
+.doctor-notes-list small,
+.engineer-details-cell,
+.engineer-table td small,
+.engineer-trash-card small,
+.engineer-user-snapshot time,
+.finance-add-coverage button,
+.finance-add-coverage input,
+.finance-alert-rail span,
+.finance-choice-add button,
+.finance-choice-add input,
+.finance-choice-label,
+.finance-choice-menu label,
+.finance-custom-fields button,
+.finance-custom-fields input,
+.finance-form-note span,
+.finance-hero-mark span,
+.finance-history-index,
+.finance-linked-empty,
+.finance-live-calc span,
+.finance-lookup-copy>span,
+.finance-mini-list b,
+.finance-report-filters input,
+.finance-rules input,
+.finance-rules-empty,
+.finance-rules-head button,
+.finance-rules>div>span,
+.finance-table td,
+.health-exit-hint,
+.health-merge-box span,
+.icon-btn strong,
+.inpatient-admin-notice span,
+.inpatient-card-table small,.inpatient-card-table span,
+.inpatient-diagnosis-view small,
+.inpatient-module-switcher>button small,
+.inpatient-note-list small,
+.inpatient-registry-head span,
+.legacy-filter-title span,
+.legacy-finance-strip span,
+.legacy-inpatient-actions button small,
+.legacy-inpatient-actions small,
+.legacy-inpatient-filter label span,
+.legacy-inpatient-table th,
+.legacy-row-actions button,
+.legacy-table-note,
+.login-security,
+.moh-diagnosis,
+.moh-registry-card span,
+.permission-head,
+.pt-coverage-cost-option small,
+.pt-demographics span,
+.pt-period-total span,
+.pt-record-toolbar button,
+.pt-report-kpis span,
+.pt-session-summary span,
+.pt-stats-breakdown small,
+.pt-stats-daily-list small,
+.pt-stats-daily-list>div small,
+.pt-stats-hero small,
+.radiology-exam-cell small,
+.rehab-case-picker>div small,
+.rehab-date-toolbar input,
+.rehab-day-followups b,
+.rehab-field-checks label,
+.rehab-hero-mark span,
+.rehab-history-item em,
+.rehab-history-item p,.rehab-history-item small,
+.rehab-history-list p,
+.rehab-needs-grid label,
+.rehab-needs-head span,
+.rehab-saved-head span,
+.rehab-section-tabs small,
+.rehab-selected-case span,.rehab-selected-case small,
+.rehab-smart-note span,
+.rehab-style-grid label span,
+.table-sub,
+.trash-detail-chip em {
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+}
+
+/* =========================================================================
+   v4.4.2 — زر القائمة عند الإخفاء + بطاقات الأوضاع
+   ========================================================================= */
+
+/* ---- 1) زر القائمة: يجلس داخل صف الشريط العلوي بدل أن يطفو فوقه ----
+   كان زراً عائماً كبيراً بكلمة "Menu" يغطي حقل البحث. صار زر أيقونة بمقاس
+   بقية أزرار الشريط، محاذياً لبدايته، مع حجز مساحته حتى لا يمر تحته شيء. */
+.sidebar-fab {
+  inset-block-start: 26px !important;
+  inset-inline-start: 26px !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  padding: 0 !important;
+  border-radius: 11px !important;
+  background: var(--input) !important;
+  border: 1px solid var(--border-strong) !important;
+  box-shadow: none !important;
+  color: var(--ink-soft) !important;
+  display: grid !important;
+  place-items: center;
+}
+.sidebar-fab span { display: none !important; }
+.sidebar-fab svg { width: 18px !important; height: 18px !important; color: currentColor !important; }
+.sidebar-fab:hover {
+  transform: none !important;
+  color: var(--cyan) !important;
+  border-color: rgba(var(--cyan-rgb), .45) !important;
+  background: rgba(var(--cyan-rgb), .1) !important;
+  box-shadow: none !important;
+}
+.app-shell.sidebar-closed .topbar { padding-inline-start: 62px !important; }
+
+@media (max-width: 900px) {
+  .sidebar-fab { inset-block-start: 20px !important; inset-inline-start: 18px !important; }
+  .app-shell.sidebar-closed .topbar { padding-inline-start: 56px !important; }
+}
+
+/* ---- 2) بطاقات الأوضاع: معاينة حقيقية لكل وضع ----
+   الخلل: البطاقة النشطة كانت تفرض نص داكن على خلفية داكنة فتصبح غير مقروءة.
+   والمربّع الصغير كان بلون واحد باهت لا يعكس الوضع الذي يمثّله.
+   الحل: كل مربّع يعرض لوحة وضعه فعلاً (الخلفية + لون الهوية)، والبطاقة
+   النشطة تُميَّز بإطار وحلقة وعلامة صح بدل تغيير لون النص. */
+
+.theme-choice { min-height: 74px !important; gap: var(--s-3) !important; }
+.theme-choice.active {
+  color: var(--ink) !important;
+  border-color: var(--cyan) !important;
+  box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .16) !important;
+  background: var(--input) !important;
+}
+.theme-choice.active b { color: var(--ink) !important; }
+.theme-choice.active small { color: var(--muted) !important; }
+
+.theme-choice i {
+  position: relative;
+  width: 40px !important;
+  height: 40px !important;
+  flex: none;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, .16) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 2px 6px rgba(0, 0, 0, .25);
+  overflow: hidden;
+}
+/* شريط لون الهوية داخل كل مربّع */
+.theme-choice i::after {
+  content: '';
+  position: absolute;
+  inset-inline: 6px;
+  bottom: 6px;
+  height: 7px;
+  border-radius: 99px;
+}
+
+/* لوحة كل وضع كما هي فعلاً */
+.theme-choice-dark i   { background: linear-gradient(140deg, #0f172a, #1e293b) !important; }
+.theme-choice-dark i::after   { background: linear-gradient(90deg, #22d3ee, #34d399); }
+
+.theme-choice-light i  { background: linear-gradient(140deg, #ffffff, #e2e8f0) !important; }
+.theme-choice-light i::after  { background: linear-gradient(90deg, #0891b2, #059669); }
+
+.theme-choice-aurora i { background: linear-gradient(140deg, #141133, #2b1b5a) !important; }
+.theme-choice-aurora i::after { background: linear-gradient(90deg, #22d3ee, #a78bfa); }
+
+.theme-choice-pearl i  { background: linear-gradient(140deg, #f7fbfa, #d8ece6) !important; }
+.theme-choice-pearl i::after  { background: linear-gradient(90deg, #0d9488, #64748b); }
+
+/* علامة الوضع المُفعَّل */
+.theme-choice.active i::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 5px;
+  inset-inline-end: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .3);
+}
+
+.theme-choice b { font-size: var(--t-base) !important; font-weight: 600 !important; }
+.theme-choice small { font-size: var(--t-xs) !important; color: var(--muted) !important; }
+.theme-choice:hover { border-color: rgba(var(--cyan-rgb), .4) !important; transform: translateY(-2px); }
+.theme-choice { transition: transform .2s var(--wx-spring), border-color .18s var(--wx-swift), box-shadow .18s var(--wx-swift) !important; }
+
+/* =========================================================================
+   v4.4.2 — تمييز الأوضاع فعلياً
+   السبب في عدم الإحساس بفرق: خلفية "الشفق" (#111827) و"الليلي" (#0f172a)
+   شبه متطابقتين، والفرق بينهما لا يكاد يُرى. الوضعان الفاتحان كذلك.
+   الحل: لكل وضع خلفية ولون هوية مختلفان بوضوح، مع انتقال ناعم عند التبديل
+   حتى يُحسّ التغيير لا أن يقع فجأة.
+   ========================================================================= */
+
+/* انتقال محسوس عند تبديل الوضع */
+body, .dock, .topbar, .panel, .stat-card, .content {
+  transition: background-color .45s var(--wx-swift), color .45s var(--wx-swift), border-color .45s var(--wx-swift);
+}
+
+/* الشفق: بنفسجي عميق بهوية بنفسجية/سماوية — لا رمادي مزرق */
+html[data-theme='aurora'] {
+  --bg: #120d2e !important;
+  --solid: #191140 !important;
+  --cyan: #38bdf8 !important;
+  --cyan-rgb: 56, 189, 248 !important;
+  --violet: #a78bfa !important;
+  --border: rgba(167, 139, 250, .18) !important;
+  --border-strong: rgba(167, 139, 250, .3) !important;
+  --input: rgba(167, 139, 250, .08) !important;
+}
+html[data-theme='aurora'] body,
+html[data-theme='aurora'] .app-shell {
+  background:
+    radial-gradient(60vmax 45vmax at 80% -10%, rgba(167, 139, 250, .2), transparent 60%),
+    radial-gradient(50vmax 40vmax at 10% 100%, rgba(56, 189, 248, .14), transparent 62%),
+    #120d2e !important;
+}
+html[data-theme='aurora'] .workspace::before {
+  background:
+    radial-gradient(48vmax 38vmax at 82% -6%, rgba(167, 139, 250, .18), transparent 62%),
+    radial-gradient(42vmax 36vmax at 6% 96%, rgba(56, 189, 248, .12), transparent 62%) !important;
+}
+
+/* اللؤلؤي: نعناعي دافئ بهوية خضراء مزرقة — لا أبيض محايد */
+html[data-theme='pearl'] {
+  --bg: #eaf6f2 !important;
+  --cyan: #0d9488 !important;
+  --cyan-rgb: 13, 148, 136 !important;
+  --border: rgba(13, 148, 136, .16) !important;
+  --border-strong: rgba(13, 148, 136, .26) !important;
+}
+html[data-theme='pearl'] body,
+html[data-theme='pearl'] .app-shell {
+  background:
+    radial-gradient(58vmax 44vmax at 78% -8%, rgba(13, 148, 136, .12), transparent 60%),
+    radial-gradient(48vmax 38vmax at 8% 100%, rgba(148, 163, 184, .16), transparent 62%),
+    #eaf6f2 !important;
+}
+
+/* النهاري: أبيض محايد صافٍ بهوية زرقاء */
+html[data-theme='light'] body,
+html[data-theme='light'] .app-shell {
+  background:
+    radial-gradient(56vmax 42vmax at 80% -8%, rgba(2, 132, 199, .09), transparent 60%),
+    #f6f9fc !important;
+}
+
+/* الليلي: كحلي هادئ بهوية سماوية/زمردية (الأساس) */
+html[data-theme='dark'] body,
+html[data-theme='dark'] .app-shell {
+  background:
+    radial-gradient(56vmax 42vmax at 80% -8%, rgba(34, 211, 238, .1), transparent 60%),
+    radial-gradient(46vmax 36vmax at 6% 100%, rgba(52, 211, 153, .07), transparent 62%),
+    #0b1220 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body, .dock, .topbar, .panel, .stat-card, .content { transition: none !important; }
+}
+
+/* =========================================================================
+   v4.4.3 — جداول شاشة المراقبة: ربطها بالأوضاع
+   السبب: جداول النشاط تستخدم ألواناً ثابتة مكتوبة في الكود
+   (#10243a للرأس، #11182a و#151d31 للصفوف، #fff للنص) بدل رموز الوضع.
+   فتبقى صفوفها كحلية داكنة داخل لوحة بيضاء عند اختيار وضع فاتح، ورأس
+   الجدول يذوب في خلفيته فلا يكاد يُقرأ.
+   الحل: كل الألوان من رموز الوضع، فتتبع الجداول أي وضع تختاره.
+   ========================================================================= */
+
+.engineer-table th,
+.engineer-table thead th {
+  background: var(--input) !important;
+  color: var(--ink) !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid rgba(var(--cyan-rgb), .35) !important;
+}
+.engineer-table td {
+  background: var(--solid) !important;
+  color: var(--ink-soft) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.engineer-table tbody tr:nth-child(even) td { background: var(--input) !important; }
+.engineer-table tbody tr:hover td { background: rgba(var(--cyan-rgb), .08) !important; }
+.engineer-table b { color: var(--ink) !important; }
+.engineer-table small, .engineer-details-cell { color: var(--muted) !important; }
+
+/* =========================================================================
+   v4.4.3 — رؤوس الجداول عموماً: تباين كافٍ في كل الأوضاع
+   ========================================================================= */
+
+thead th {
+  color: var(--ink) !important;
+  font-weight: 700 !important;
+  background: var(--input) !important;
+  border-bottom: 2px solid rgba(var(--cyan-rgb), .3) !important;
+}
+html[data-theme='light'] thead th,
+html[data-theme='pearl'] thead th { background: rgba(var(--cyan-rgb), .06) !important; }
+
+/* =========================================================================
+   v4.4.3 — ألوان أغنى لكل وضع
+   لكل وضع الآن لونا هوية (أساسي وثانوي) يظهران في الأزرار والشارات
+   والرسوم، فيختلف إحساس النظام لا خلفيته فقط.
+   ========================================================================= */
+
+html[data-theme='dark'] {
+  --cyan: #22d3ee !important; --cyan-rgb: 34, 211, 238 !important;
+  --emerald: #34d399 !important; --emerald-rgb: 52, 211, 153 !important;
+  --violet: #818cf8 !important;
+  --amber: #fbbf24 !important;
+}
+html[data-theme='aurora'] {
+  --emerald: #c084fc !important; --emerald-rgb: 192, 132, 252 !important;
+  --amber: #fb7185 !important;
+  --violet: #a78bfa !important;
+}
+html[data-theme='light'] {
+  --cyan: #0284c7 !important; --cyan-rgb: 2, 132, 199 !important;
+  --emerald: #059669 !important; --emerald-rgb: 5, 150, 105 !important;
+  --violet: #7c3aed !important;
+  --amber: #d97706 !important;
+}
+html[data-theme='pearl'] {
+  --emerald: #0f766e !important; --emerald-rgb: 15, 118, 110 !important;
+  --violet: #6366f1 !important;
+  --amber: #b45309 !important;
+}
+
+/* الزر الأساسي يأخذ تدرج هوية وضعه */
+.btn-primary, .lxc-submit {
+  background: linear-gradient(135deg, var(--cyan), var(--emerald)) !important;
+}
+html[data-theme='aurora'] .btn-primary { color: #150d2e !important; }
+
+/* الشريط الجانبي والعنصر النشط بلون الوضع */
+.dock-item.active {
+  background: linear-gradient(90deg, rgba(var(--cyan-rgb), .22), rgba(var(--cyan-rgb), .07)) !important;
+  border-color: rgba(var(--cyan-rgb), .35) !important;
+}
+.dock-item.active .dock-ico, .dock-item.active::before { color: var(--cyan); background-color: var(--cyan); }
+.dock-item.active .dock-ico { background: none !important; }
+
+/* v4.5.0 — صف إدارة قائمة التشخيصات */
+.diag-manage { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+.diag-manage input { flex: 1 1 200px; min-width: 0; }
+.diag-hint { display: block; margin-top: var(--s-2); font-size: var(--t-xs); color: var(--muted); }
+
+/* =========================================================================
+   v4.5.2 — إصلاحات واجهة نهائية: القائمة، الاستعلام، شارة التدقيق، والتداخل
+   ========================================================================= */
+
+/* 1) عند إخفاء القائمة لا نترك شريطاً جانبياً ثانياً؛ يظهر زر فتح واحد فقط. */
+.app-shell.sidebar-closed .dock {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  transform: translateX(-120%) !important;
+}
+[dir='rtl'] .app-shell.sidebar-closed .dock {
+  transform: translateX(120%) !important;
+}
+.app-shell.sidebar-closed .workspace {
+  margin-inline-start: 0 !important;
+}
+.app-shell.sidebar-closed .topbar {
+  padding-inline-start: 72px !important;
+}
+.sidebar-fab {
+  position: fixed !important;
+  z-index: 120 !important;
+  inset-block-start: 26px !important;
+  inset-inline-start: 26px !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border-radius: 14px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: linear-gradient(135deg, rgba(var(--cyan-rgb), .16), rgba(var(--emerald-rgb), .10)), var(--solid) !important;
+  border: 1px solid rgba(var(--cyan-rgb), .28) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.20) !important;
+  color: var(--ink) !important;
+}
+.sidebar-fab span { display: none !important; }
+.sidebar-fab svg { width: 20px !important; height: 20px !important; }
+.sidebar-fab:hover { color: var(--cyan) !important; border-color: rgba(var(--cyan-rgb), .5) !important; }
+@media (max-width: 900px) {
+  .app-shell.sidebar-closed .topbar { padding-inline-start: 62px !important; }
+  .sidebar-fab { inset-block-start: 22px !important; inset-inline-start: 18px !important; }
+}
+
+/* 2) شبكة اختيار أعمدة الاستعلام: أيقونات/Check boxes واضحة بلا تداخل. */
+.reports-layout { align-items: start !important; }
+.report-section { min-width: 0 !important; overflow: hidden !important; }
+.checkbox-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+.checkbox-grid label {
+  min-height: 44px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--input) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+.checkbox-grid label span {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.55 !important;
+  color: var(--ink) !important;
+  font-size: var(--t-sm) !important;
+  font-weight: 700 !important;
+}
+.checkbox-grid label input[type='checkbox'] {
+  position: static !important;
+  flex: 0 0 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  accent-color: var(--cyan) !important;
+}
+[dir='rtl'] .checkbox-grid label { flex-direction: row-reverse !important; text-align: right !important; }
+[dir='ltr'] .checkbox-grid label { flex-direction: row !important; text-align: left !important; }
+.report-filter-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: 12px !important;
+}
+.dual-range {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: end !important;
+}
+.dual-range label, .dual-range input { min-width: 0 !important; }
+@media (max-width: 640px) {
+  .dual-range { grid-template-columns: 1fr !important; }
+  .checkbox-grid, .report-filter-grid { grid-template-columns: 1fr !important; }
+}
+
+/* 3) واجهة المدقق المالي: شارة الحالة لا تظهر كدائرة مضغوطة أو نص مقصوص. */
+.audit-table { table-layout: auto !important; }
+.audit-table th:first-child, .audit-table td:first-child { min-width: 128px !important; width: 128px !important; text-align: center !important; }
+.audit-table .badge {
+  min-width: 92px !important;
+  max-width: 100% !important;
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+  border-radius: 999px !important;
+}
+.audit-table .badge svg { width: 14px !important; height: 14px !important; }
+.audit-table td, .workflow-table td { vertical-align: middle !important; }
+.table-actions { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; align-items: center !important; }
+.table-actions .btn { min-width: max-content !important; }
+
+/* 4) مراجعة عامة للتداخل: أي نص طويل ينكسر داخل حدوده، والجداول لا تكسر الصفحة. */
+.panel, .glass, .glass-strong, .stat-card, .doctor-card, .clinic-card, .registration-card,
+.workflow-toolbar, .report-section, .form-grid, .table-wrap, .modal, .card {
+  min-width: 0 !important;
+}
+.panel *, .stat-card *, .doctor-card *, .clinic-card *, .registration-card *, .workflow-toolbar *,
+.report-section *, .form-grid *, .modal *, .card * {
+  min-width: 0;
+}
+.table-wrap {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+}
+table { max-width: 100% !important; }
+td, th, .btn, .badge, .field span, .panel-head h3, .page-head h1, .page-head p {
+  overflow-wrap: anywhere;
+}
+.btn, .badge, .chip, .status-pill {
+  white-space: normal !important;
+}
+.btn svg, .badge svg, .chip svg, .status-pill svg { flex: 0 0 auto !important; }
+
+/* 5) اسم الشاشة حسب المطلوب. */
+.dock-item[href='/engineer-activity'] span,
+.engineer-console-page .page-head h1 {
+  overflow-wrap: anywhere !important;
+}
+
+/* =========================================================================
+   v4.5.4 — root fixes: single menu trigger, non-sticky command bar,
+   receipt template preview, admission visibility, and export-safe layout.
+   ========================================================================= */
+
+/* One menu control only: the floating opener when closed, the dock toggle when open. */
+.mobile-menu{display:none!important;}
+.app-shell.sidebar-closed .dock{opacity:0!important;visibility:hidden!important;pointer-events:none!important;width:0!important;min-width:0!important;}
+.app-shell.sidebar-open .sidebar-fab{display:none!important;}
+.sidebar-fab{z-index:140!important;}
+
+/* The command/search bar stays in normal document flow and never covers content while scrolling. */
+.app-shell .topbar,
+.topbar{
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  z-index:40!important;
+}
+html.wx-scrolled .topbar{box-shadow:0 1px 0 rgba(255,255,255,.045),0 10px 28px rgba(0,0,0,.14)!important;}
+
+/* New admission modal must always remain fully visible and scroll internally on small screens. */
+.inpatient-admission-modal{width:min(1080px,calc(100vw - 28px))!important;max-height:92vh!important;overflow:hidden!important;}
+.inpatient-admission-modal .inpatient-admission-form{max-height:calc(92vh - 72px)!important;overflow:auto!important;overscroll-behavior:contain!important;}
+.inpatient-admission-modal .form-grid,.inpatient-admission-modal .inpatient-choice-grid{min-width:0!important;}
+@media(max-width:760px){
+  .inpatient-admission-modal{width:calc(100vw - 18px)!important;}
+  .inpatient-admin-form-grid{grid-template-columns:1fr!important;}
+  .inpatient-admin-form-grid .field-span2,.inpatient-admin-form-grid .field-span3{grid-column:auto!important;}
+}
+
+/* Financial collector receipt preview — same logical template before printing/PDF. */
+.receipt-template-modal{width:min(980px,96vw)!important;}
+.receipt-template-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:12px;}
+.receipt-template-summary>div{border:1px solid var(--border);background:var(--input);border-radius:13px;padding:10px 12px;display:grid;gap:4px;min-width:0;}
+.receipt-template-summary span{font-size:10px;color:var(--muted);font-weight:800;}
+.receipt-template-summary b,.receipt-template-summary strong{font-size:12px;color:var(--ink);overflow-wrap:anywhere;}
+.receipt-template-summary strong{color:var(--cyan);font-size:15px;}
+.receipt-template-frame-wrap{display:flex;justify-content:center;align-items:flex-start;min-height:420px;max-height:64vh;overflow:auto;border:1px solid var(--border);border-radius:18px;background:#e8edf3;padding:14px;}
+.receipt-template-frame{display:block;width:min(420px,100%);height:620px;min-height:620px;border:0;border-radius:12px;background:#fff;box-shadow:0 12px 30px rgba(10,25,45,.16);}
+.receipt-template-note{margin:10px 0 0;color:var(--muted);font-size:10.5px;line-height:1.7;}
+.collector-table td:last-child .btn{white-space:nowrap;}
+.queue-ticket-mini{direction:ltr;unicode-bidi:isolate;display:inline-flex;align-items:center;justify-content:center;min-width:68px;padding:5px 8px;border-radius:9px;border:1px solid rgba(var(--cyan-rgb),.28);background:rgba(var(--cyan-rgb),.08);color:var(--cyan);font-family:Inter,"Segoe UI",sans-serif;font-weight:900;}
+@media(max-width:760px){
+  .receipt-template-summary{grid-template-columns:1fr 1fr;}
+  .receipt-template-frame{height:560px;min-height:560px;}
+}
+@media(max-width:480px){.receipt-template-summary{grid-template-columns:1fr;}}

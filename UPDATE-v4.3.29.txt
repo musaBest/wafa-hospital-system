@@ -1,0 +1,10 @@
+Wafaa Hospital System v4.3.29
+
+- Added a dedicated inpatient finance Account Statement screen.
+- The screen is linked to admitted/discharged inpatient administrative cases.
+- Patient can be found by national ID, unified medical/case number, or full name.
+- Added selectable report fields matching the statement template: patient data, entitlement table fields, and net summary fields.
+- Added custom field support for account statement reports.
+- Added official account statement export template matching the supplied black-and-white hospital report layout.
+- Account statement can be exported as PDF, Word, or Excel.
+- No database migration or seeder changes are required.

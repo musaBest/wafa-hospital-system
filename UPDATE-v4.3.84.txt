@@ -1,0 +1,8 @@
+WAFAA HIS v4.3.84
+
+- Rebuilt the sidebar collapsed layout so the hidden menu no longer leaves an awkward narrow rail or clipped workspace.
+- Added final RTL/LTR-safe workspace geometry using logical spacing and exact viewport math.
+- Improved the floating menu button and drawer transition for a cleaner professional collapsed state.
+- Fixed inpatient/admissions action cards so they wrap automatically at normal screen size without requiring browser zoom-out.
+- Added global responsive safeguards for dashboard cards, panels, tables, and action grids to prevent hidden menus/cards on standard displays.
+- Preserved all v4.3.80–v4.3.83 fixes including silent report generation, elderly-care module, inquiries improvements, language switching, and theme consistency.

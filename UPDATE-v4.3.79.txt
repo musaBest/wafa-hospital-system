@@ -1,0 +1,14 @@
+WAFAA Hospital System v4.3.80
+
+Silent Reports Creation / White Screen Fix
+
+- Implemented a deeper cleanup for all report/export temporary DOM containers.
+- Removed leftover html2canvas containers after PDF/Word/Excel generation.
+- Forced all html2canvas captures to remove their clone container after rendering.
+- Moved offscreen report rendering hosts far outside the viewport to prevent any white flash or visible blank layer.
+- Kept export modals/screens stable after pressing Create so the page does not visually jump or change unexpectedly.
+- Preserved the existing report templates, designer controls, needs branches, and all v4.3.78 features.
+
+Checks performed:
+- PHP syntax check for app/routes/database PHP files: passed.
+- TS/TSX syntax transpile check for source files: passed.

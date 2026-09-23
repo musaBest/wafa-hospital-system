@@ -1,0 +1,16 @@
+Wafaa Hospital System v4.3.38
+
+- Added a new inpatient branch: Internal Physical Therapy.
+- Renamed visible Arabic wording from التنويم to المبيت where applicable.
+- All active inpatient admissions appear automatically in the new internal PT branch without re-entering patient demographics or diagnosis.
+- Added therapist/nurse management with male/female scope:
+  * Male staff show male inpatient cases.
+  * Female staff show women and children cases.
+- Added checkbox assignment of patients to each therapist/nurse.
+- Added configurable session counts and assignment notes.
+- Added patient evaluation modal. Saved evaluations are sent to the inpatient/rehab report history for the patient.
+- Added PT statistics reports with filters by date, gender, ward, age range, children-only and search by name/ID/medical serial.
+- Added report columns selector and custom extra report fields.
+- Added PDF, Word and Excel export for internal PT reports.
+- Added therapist assignment summary table.
+- Added inpatient_pt permissions to the system permission catalog and user-management screen.

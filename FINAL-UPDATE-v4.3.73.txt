@@ -1,0 +1,17 @@
+WAFA Hospital System v4.3.73
+==============================
+
+- Added a new Operations page (العمليات).
+- Added identity lookup for operations using patient file first, then civil registry API.
+- Added required phone and optional address/marital status fields for operation admission registration.
+- Added operation case data screen: diagnosis, doctor name, admission/discharge dates, stay duration, referral entity, department, case number, insurance number, conversion reason/duration.
+- Referral entity list is flexible and supports adding new entities from the UI.
+- Added PDF/print export for the patient admission permit (إذن دخول مريض) in A4, matching the provided template and adding the hospital logo only.
+- Added database-backed persistence for operation cases so data remains after refresh.
+- Added permissions: operations.view, operations.create, operations.print.
+- Added built-in operations user: operations / Operations@2026.
+
+Run after extracting:
+cd wafa-api
+php artisan migrate --force
+php artisan optimize:clear

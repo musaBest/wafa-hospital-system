@@ -1,0 +1,25 @@
+Wafaa Hospital System v4.3.41
+
+Changes:
+- Added a global English translation layer that translates hardcoded Arabic UI labels, buttons, notifications, placeholders, dropdowns, and report preview text when the language is switched to English.
+- Improved logical English terms across inpatient, physical therapy, patients, diagnostics, billing, reports, users, permissions, and shared controls.
+- Preserved patient-entered data while translating surrounding UI labels.
+- Improved the inpatient internal physical therapy printable report: smaller readable print font, stronger dark table borders, clearer headers, and safer wrapping to prevent numbers/text overlap in PDF/Word exports.
+
+Run:
+Backend:
+cd wafa-api
+composer install
+php artisan migrate
+php artisan db:seed
+php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear
+php -S 127.0.0.1:8088 -t public public/index.php
+
+Frontend:
+cd wafa-web
+npm install
+npm run dev
+
+Open http://localhost:5173 and press Ctrl+F5 once.

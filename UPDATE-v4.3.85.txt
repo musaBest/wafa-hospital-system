@@ -1,0 +1,17 @@
+WAFAA Hospital System - v4.3.85
+================================
+
+UI polish and interaction update:
+- Removed distracting icon ghost/halo effects from the top bar, menu button, sidebar, and action icons.
+- Made the collapsed menu trigger cleaner and more professional.
+- Improved top-bar wrapping so search, menu, and actions do not overlap page content.
+- Enhanced the startup/refresh splash screen with a more polished logo card and calmer loading presentation.
+- Added site-wide Enter-key behavior for forms, modals, command search, and focused action controls.
+- Added subtle non-shifting page/card animations and smoother interactive feedback.
+- Hardened theme consistency for dark, light, aurora, and pearl modes across headers, panels, inputs, and popovers.
+
+Preserved:
+- v4.3.80 no-white-report-overlay fix.
+- v4.3.81 elderly-care module.
+- v4.3.82 unified inquiries and responsive improvements.
+- v4.3.83/v4.3.84 sidebar and language/theme improvements.

@@ -1,0 +1,12 @@
+WAFA Hospital System v4.3.77 - Print, Export, Layout, Social Attachment
+
+- Added age and stay-days fields to the inpatient financial declaration and injected them into the official declaration text instead of placeholder values.
+- Hardened PDF/Word/Excel export capture hosts so exports stay offscreen and do not leave a white page/white overlay on the app screen.
+- Improved operation admission patient lookup card so generated patient number text and long values are fully visible.
+- Reworked inpatient operation console action cards to wrap text cleanly and stay responsive on different screen sizes.
+- Fixed outpatient physical therapy report filter/patient fields so inputs remain inside the panel and resize correctly.
+- Rebuilt the cashier visit receipt print CSS for thermal printers with adjustable width, height, margin, and font scale from the collector screen.
+- Added image attachment support to the inpatient social/psychological service page and included the image in exported/printed reports.
+- Added responsive CSS hardening for reports, export hosts, receipt settings, and social image previews.
+
+Run 01-SETUP-WINDOWS.bat after extracting, then run 02-START-FULL-STACK.bat or the manual backend/frontend commands.

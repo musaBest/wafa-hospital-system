@@ -1,0 +1,8 @@
+Wafa Hospital System v4.3.26
+
+- Rebuilt inpatient rehabilitation printed reports to match the provided legacy report templates.
+- Updated "To Whom It May Concern" PDF/Word print layout to the exact simple black-and-white official form style.
+- Updated Needs Report print layout to match the sample: date, underlined title, bordered patient strip, diagnosis/functional status, numbered needs list, and signature area.
+- Updated Follow Cases print layout to match the old FOLLOW CASES structure with case header boxes and medical follow-up content.
+- Fixed duplicate rehab tab icon/button in the rehabilitation file.
+- No backend migration or database seeder changes.

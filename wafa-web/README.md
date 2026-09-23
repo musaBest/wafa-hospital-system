@@ -1,16 +1,70 @@
-# React + Vite
+# Wafaa HIS — React Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+واجهة React مبنية على نموذج `wafa(3).html`. تسجيل الدخول وإدارة المستخدمين والصلاحيات متصلة الآن بـLaravel وقاعدة البيانات، بينما تستمر بيانات العرض الطبية التجريبية في `localStorage` كما كانت دون تغيير.
 
-Currently, two official plugins are available:
+## التشغيل
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+يتطلب Node.js 18 أو أحدث، مع تشغيل Laravel على `127.0.0.1:18088`.
 
-## React Compiler
+على Windows يمكنك تشغيل الملف `START-WAFAA.bat` مباشرة، أو استخدام الأوامر:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+npm install
+npm run dev
+```
 
-## Expanding the Oxlint configuration
+ثم افتح: `http://localhost:5173`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## حسابات التجربة
+
+لا تُعرض الحسابات كخيارات في واجهة تسجيل الدخول.
+
+- الإدارة: `Dr.Fouad_Najm` / `Admin@2026`
+- الكاشير: `cashier` / `Cashier@2026`
+- رئيس قسم IT: `Eng.Ahmed_Jaber` / `IT@2026`
+- أمين الصندوق: `Eng.Mohammed_Moqbil` / `Treasury@2026`
+- حساب الطبيب: ينشئه رئيس قسم IT أو أمين الصندوق من صفحة الأطباء، ويحدد رقم الطبيب وكلمة المرور.
+
+## الصلاحيات المالية
+
+- الإدارة: عرض جميع تفاصيل المستشفى دون تعديل، ودون التقارير أو الملفات المالية.
+- رئيس قسم IT: إضافة وتعديل كل البيانات غير المالية، دون الفواتير والحوالات أو الحساب المالي للمريض.
+- أمين الصندوق: صلاحيات كاملة، بما فيها الفواتير والحوالات والحساب المالي والتقارير المالية والطباعة.
+- الكاشير: العمليات اليومية وتسجيل المرضى والزيارات وإصدار الفواتير، دون إدارة العيادات والأطباء أو استعراض الحوالات والتقارير المالية.
+
+## بناء نسخة الإنتاج
+
+```powershell
+npm run build
+npm run preview
+```
+
+## المزايا
+
+- واجهة عربية وإنجليزية مع RTL/LTR.
+- مظهر داكن وفاتح.
+- شريط جانبي قابل للفتح والإغلاق ولا يغطي المحتوى.
+- جميع أقسام ملف HTML: لوحة القيادة، المرضى، الطابور، التنويم، المختبر والأشعة، الفواتير، الأطباء، العيادات، التقارير والإعدادات.
+- نماذج إدخال وتفاعلات محلية وواجهة أشعة تجريبية.
+- حفظ محلي للبيانات بدون خادم.
+- تسجيل مريض بمدخلين فقط وربط تجريبي للسجل المدني.
+- رقم طبي: الجنس + سنة التسجيل + تسلسل سنوي يبدأ من `1102`.
+- محفظة وسجل مالي وإيصالات، مع منع الزيارة عند عدم كفاية الرصيد.
+- لوحة طبيب خاصة، أرقام دور، ملاحظات سرية، وإنشاء مراجعة بعد 7 أيام.
+- إدارة العيادات ورسوم الزيارة والجهات الداعمة.
+- تقارير مخصصة قابلة للتصدير إلى Excel بصيغة `.xlsx`.
+- صفحة ديناميكية لإضافة المستخدمين وتعديلهم وأرشفتهم وتحديد صلاحيات كل صفحة وعملية.
+
+## مكان API السجل المدني
+
+واجهة React تستدعي مسار Laravel الآمن فقط من خلال `src/services/civilRegistry.service.ts`. لا تضع رابط الجهة أو `client_secret` أو التوكن داخل Vite أو المتصفح.
+
+جميع القيم الرسمية توضع في `wafa-api/.env`. راجع الدليل الكامل في `docs/CIVIL_REGISTRY_API_SETUP.md` داخل جذر المشروع.
+
+## جاهزية Laravel
+
+- نماذج الطلبات موجودة في `src/dto/api.dto.ts`.
+- عميل REST موجود في `src/services/apiClient.ts`.
+- عقود العمليات الأساسية موجودة في `src/services/hospitalApi.service.ts`.
+- أثناء التطوير يمرّر Vite طلبات `/api` إلى `http://127.0.0.1:18088`.
+- في الاستضافة اضبط `VITE_API_BASE_URL` بعنوان Laravel العام قبل تنفيذ `npm run build`.

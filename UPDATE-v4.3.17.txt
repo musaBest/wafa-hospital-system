@@ -1,0 +1,18 @@
+Wafa Hospital System v4.3.17
+============================
+
+Users & Permissions - immediate edit/save update
+-------------------------------------------------
+Built on v4.3.16.
+
+- Editing users from Eng.Ahmed_Jaber or Eng.Mohammed_Moqbil now applies the saved values immediately in the Users & Permissions screen.
+- The UI applies the canonical PATCH response instantly, then silently refreshes the users list from the API so the screen always matches the database without pressing Refresh.
+- If the currently logged-in account is edited, its session data is refreshed automatically so updated identity/permissions are reflected without logging out and back in.
+- GET requests for users and permission definitions use no-store caching to avoid stale access-control data after a save.
+- When Eng. Ahmed edits an account that already has financial permissions granted by Eng. Mohammed, those hidden financial grants are preserved exactly. Eng. Ahmed can edit the account's allowed non-financial fields/permissions without accidentally deleting the protected financial grants.
+- Only Eng. Mohammed can add, remove, or change financial permissions. Existing treasury-account protection remains unchanged.
+
+Database notes
+--------------
+No migration and no new seeder data are required for v4.3.17.
+Running `php artisan migrate` and `php artisan db:seed` remains safe for a normal fresh setup.

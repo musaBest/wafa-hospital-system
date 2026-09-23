@@ -1,0 +1,5 @@
+v4.3.64
+- Fixed inpatient needs report numbering to render visually as: 1 - item from the right side.
+- Forced export/print capture hosts off-screen and darkened modal backdrop to stop white-screen flashes.
+- Rebuilt inpatient action cards grid so all icons/cards wrap and remain visible without browser zoom.
+- Kept the doctor name as: د. سامي عويمر.

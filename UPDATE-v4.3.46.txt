@@ -1,0 +1,17 @@
+Wafaa Hospital System v4.3.46
+
+إصلاح جذري لأداء الواجهة وتجمّد الكتابة على Windows/Chrome
+
+- إصلاح آلية ترجمة DOM التي كانت تستطيع إعادة إطلاق MutationObserver بشكل متكرر.
+- تعطيل مراقبة DOM بالكامل في اللغة العربية الافتراضية، وتشغيلها فقط للإنجليزية مع batching.
+- تقسيم الصفحات إلى lazy-loaded route chunks؛ صفحة الدخول لم تعد تحمّل وحدات المبيت والمختبر والتقارير والعلاج الطبيعي مسبقاً.
+- HospitalContext لم يعد يُحمّل أو يقرأ بيانات المستشفى من localStorage قبل نجاح تسجيل الدخول.
+- إزالة React StrictMode من تشغيل التطوير لمنع مضاعفة تهيئة state/effects أثناء npm run dev.
+- تأخير حفظ HospitalContext الكبير إلى localStorage بدلاً من JSON.stringify بعد كل تغيير مباشرة.
+- تحويل صفحة الدخول إلى static-paint mode وإلغاء blur/masks/animations/transitions الثقيلة أثناء الكتابة وAutofill.
+- تعطيل backdrop blur والخلفيات fixed المكلفة على مستوى النظام لتقليل ضغط GPU.
+- عزل ساعة AppShell في مكوّن مستقل وتحديثها كل 30 ثانية بدلاً من إعادة Render لكامل الواجهة كل ثانية.
+- إزالة Google Fonts الخارجية من CSS واستخدام خطوط النظام المحلية لتفادي تأخير الشبكة.
+
+لا يحتاج هذا التحديث إلى Migration جديد.
+بعد فك الضغط شغّل الواجهة ثم نفّذ Ctrl+Shift+R مرة واحدة في المتصفح.

@@ -1,0 +1,21 @@
+Wafaa Hospital System v4.3.47
+
+Login compatibility + Windows local server fix
+
+- Fixed HTTP 500 during login caused by legacy bcrypt hashes using the $2b$ prefix.
+- Laravel strict BcryptHasher identifies only its native $2y$ prefix; v4.3.47 safely verifies compatible legacy $2a$/$2b$ hashes and immediately rehashes them with Laravel after a successful login.
+- Normalized the bundled SQLite databases and SQL dump to $2y$ while preserving the bcrypt payload.
+- Kept HASH_VERIFY enabled globally; no security-wide bypass is required.
+- Changed the local Laravel development port from 8088 to 18088 to match the Windows environment where php artisan serve/8088/8090 failed but PHP's built-in server on 18088 worked.
+- Updated the Vite proxy and Windows start script accordingly.
+
+Run locally:
+Backend:
+  cd wafa-api
+  php -S 127.0.0.1:18088 -t public public/index.php
+
+Frontend:
+  cd wafa-web
+  npm run dev
+
+Open: http://localhost:5173

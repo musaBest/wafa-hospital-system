@@ -1,0 +1,11 @@
+WAFA Hospital System v4.3.69
+
+Hotfix for API_ERROR_403 toast loop on Doctor Dashboard.
+
+Changes:
+- Doctor Dashboard is now visible only for real doctor accounts that are linked to a doctor profile.
+- Eng. Mohammed / admin-style accounts no longer see or enter the Doctor Dashboard route by mistake.
+- If an old browser URL opens /doctor-dashboard with a non-doctor account, the app redirects to the correct home page instead of repeatedly calling doctor-only API endpoints.
+- DoctorDashboardPage now has an internal safety guard to prevent repeated doctor API calls when the current user is not a linked doctor.
+
+Existing v4.3.68 workflow remains unchanged.

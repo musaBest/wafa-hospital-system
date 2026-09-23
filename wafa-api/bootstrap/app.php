@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\PermissionMiddleware;
+use App\Http\Middleware\PrimaryCashierMiddleware;
+use App\Http\Middleware\BillingOperatorMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,11 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureStaffRole::class,
-            'forbid.role' => \App\Http\Middleware\ForbidStaffRole::class,
-        ]);
+        $middleware->alias(['role' => RoleMiddleware::class, 'permission' => PermissionMiddleware::class, 'cashier.only' => PrimaryCashierMiddleware::class, 'billing.operator' => BillingOperatorMiddleware::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Laravel's JSON exception renderer is used for /api requests.
     })->create();

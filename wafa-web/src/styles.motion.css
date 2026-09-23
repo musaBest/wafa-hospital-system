@@ -1,0 +1,2723 @@
+/* =========================================================================
+   WAFAA HIS — v4.3.86  طبقة الحركة والهوية البصرية
+   تُحمّل بعد styles.css وتفرض نظام حركة موحّد على كل الواجهات.
+   المبدأ: تسلسل واحد منظم عند الإقلاع + حركة تستجيب لفعل المستخدم فقط.
+   ========================================================================= */
+
+:root {
+  --wx-spring: cubic-bezier(.22, 1, .36, 1);
+  --wx-swift: cubic-bezier(.4, 0, .2, 1);
+  --wx-fast: .16s;
+  --wx-base: .26s;
+  --wx-slow: .46s;
+  --wx-brand-blue: #0068a9;
+  --wx-brand-sky: #20a9d1;
+  --wx-brand-red: #ed1c24;
+  --wx-rail: linear-gradient(180deg, var(--cyan), var(--emerald));
+  --wx-scroll: 0%;
+}
+
+/* =========================================================================
+   1) شاشة الإقلاع — تسلسل فحص وتهيئة
+   ========================================================================= */
+
+.wx-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--ink);
+  background: var(--bg-grad), var(--bg);
+  transition: opacity .5s var(--wx-swift), transform .5s var(--wx-spring), visibility .5s;
+}
+.wx-boot.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.035);
+}
+.wx-boot-grid {
+  position: absolute;
+  inset: -10%;
+  opacity: .6;
+  background-image:
+    linear-gradient(to right, rgba(var(--cyan-rgb), .17) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--cyan-rgb), .17) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(60% 55% at 50% 45%, #000 20%, transparent 78%);
+  -webkit-mask-image: radial-gradient(60% 55% at 50% 45%, #000 20%, transparent 78%);
+  animation: wx-grid-drift 18s linear infinite;
+}
+.wx-boot-glow {
+  position: absolute;
+  width: 46vmax;
+  height: 46vmax;
+  border-radius: 50%;
+  filter: blur(96px);
+  opacity: .24;
+  pointer-events: none;
+}
+.wx-boot-glow-a { background: var(--wx-brand-sky); inset-inline-start: -14vmax; inset-block-start: -18vmax; animation: wx-float-a 9s ease-in-out infinite; }
+.wx-boot-glow-b { background: var(--violet); inset-inline-end: -16vmax; inset-block-end: -20vmax; animation: wx-float-b 11s ease-in-out infinite; }
+
+.wx-boot-stage {
+  position: relative;
+  z-index: 2;
+  width: min(440px, calc(100vw - 36px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.wx-boot-mark { position: relative; display: grid; place-items: center; width: 250px; height: 250px; }
+.wx-boot-ring {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(var(--cyan-rgb), .2);
+  border-top-color: var(--wx-brand-sky);
+  border-inline-end-color: rgba(var(--emerald-rgb), .7);
+  animation: wx-spin 4.6s linear infinite;
+}
+.wx-boot-ring-2 {
+  inset: 20px;
+  border-style: dashed;
+  border-color: rgba(var(--cyan-rgb), .22);
+  border-bottom-color: var(--wx-brand-red);
+  animation: wx-spin 7.5s linear reverse infinite;
+}
+.wx-boot-plate {
+  position: relative;
+  width: 190px;
+  height: 142px;
+  display: grid;
+  place-items: center;
+  padding: 12px 16px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(150deg, #fff, #f3f7fb);
+  border: 1px solid rgba(15, 23, 42, .1);
+  box-shadow: 0 26px 60px rgba(4, 34, 62, .38);
+  animation: wx-plate-in .7s var(--wx-spring) both;
+}
+.wx-boot-plate img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.wx-boot-scan {
+  position: absolute;
+  inset-inline: 0;
+  height: 42%;
+  top: -42%;
+  background: linear-gradient(180deg, transparent, rgba(32, 169, 209, .3), transparent);
+  animation: wx-scan 2.1s var(--wx-swift) infinite;
+}
+
+.wx-boot-title { margin: 20px 0 5px; font-size: 27px; font-weight: 900; letter-spacing: -.02em; animation: wx-rise .55s var(--wx-spring) .1s both; }
+.wx-boot-sub { margin: 0; font-size: 12px; color: var(--muted); animation: wx-rise .55s var(--wx-spring) .18s both; }
+
+.wx-boot-trace { width: 100%; height: 52px; margin: 6px 0 2px; overflow: visible; }
+.wx-boot-trace path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wx-trace-base { stroke: rgba(var(--cyan-rgb), .22); }
+.wx-trace-live {
+  stroke: var(--cyan);
+  stroke-dasharray: 70 680;
+  animation: wx-trace 2.6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(var(--cyan-rgb), .6));
+}
+
+.wx-boot-steps { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; width: 100%; }
+.wx-boot-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid transparent;
+  opacity: .42;
+  transition: all var(--wx-base) var(--wx-spring);
+}
+.wx-boot-steps li i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); flex: none; transition: all var(--wx-base) var(--wx-spring); }
+.wx-boot-steps li.is-active { opacity: 1; color: var(--ink); border-color: rgba(var(--cyan-rgb), .25); background: rgba(var(--cyan-rgb), .07); }
+.wx-boot-steps li.is-active i { background: var(--cyan); box-shadow: 0 0 0 4px rgba(var(--cyan-rgb), .16); animation: wx-blip 1s ease-in-out infinite; }
+.wx-boot-steps li.is-done { opacity: 1; color: var(--ink-soft); }
+.wx-boot-steps li.is-done i { background: var(--emerald); box-shadow: 0 0 10px rgba(var(--emerald-rgb), .5); }
+
+.wx-boot-meter { width: 100%; height: 4px; margin-top: 16px; border-radius: 99px; overflow: hidden; background: var(--border-strong); }
+.wx-boot-meter i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--wx-brand-blue), var(--wx-brand-sky), var(--emerald)); transition: width .34s var(--wx-spring); }
+
+html[data-theme='light'] .wx-boot,
+html[data-theme='pearl'] .wx-boot { background: var(--bg-grad), var(--bg); }
+html[data-theme='light'] .wx-boot-plate,
+html[data-theme='pearl'] .wx-boot-plate { box-shadow: 0 24px 55px rgba(30, 41, 59, .16); }
+
+@keyframes wx-spin { to { transform: rotate(360deg); } }
+@keyframes wx-scan { 0% { top: -45%; } 70%, 100% { top: 105%; } }
+@keyframes wx-trace { from { stroke-dashoffset: 750; } to { stroke-dashoffset: 0; } }
+@keyframes wx-blip { 50% { transform: scale(1.5); } }
+@keyframes wx-plate-in { from { opacity: 0; transform: translateY(14px) scale(.9); } }
+@keyframes wx-rise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes wx-grid-drift { to { transform: translate3d(48px, 48px, 0); } }
+@keyframes wx-float-a { 50% { transform: translate3d(5vmax, 4vmax, 0) scale(1.1); } }
+@keyframes wx-float-b { 50% { transform: translate3d(-4vmax, -5vmax, 0) scale(1.08); } }
+
+/* =========================================================================
+   2) دخول الواجهة بعد الإقلاع — تسلسل واحد فقط
+   ========================================================================= */
+
+.app-shell .dock { animation: wx-dock-in .6s var(--wx-spring) .05s both; }
+.app-shell .topbar { animation: wx-top-in .5s var(--wx-spring) .14s both; }
+.app-shell .content { animation: wx-rise .5s var(--wx-spring) .2s both !important; }
+
+@keyframes wx-dock-in { from { opacity: 0; transform: translateX(calc(var(--wx-dock-dir, 1) * -26px)); } }
+@keyframes wx-top-in { from { opacity: 0; transform: translateY(-14px); } }
+[dir='rtl'] .app-shell .dock { --wx-dock-dir: -1; }
+
+/* تنقّل بين الصفحات: انتقال واحد هادئ */
+.page-transition { animation: wx-page-in .34s var(--wx-spring) both !important; }
+@keyframes wx-page-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* =========================================================================
+   3) القائمة الجانبية — تجميع، مؤشر نشط متحرك، وتلميحات عند الطي
+   ========================================================================= */
+
+.dock { --wx-dock-pad: 10px; }
+.dock-nav { padding: 10px var(--wx-dock-pad) 14px !important; gap: 2px !important; scrollbar-width: thin; }
+
+.dock-filter {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  margin-bottom: 10px;
+  padding: 0 11px;
+  border-radius: 12px;
+  background: var(--input);
+  border: 1px solid var(--border);
+  transition: border-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift);
+}
+.dock-filter:focus-within { border-color: rgba(var(--cyan-rgb), .45); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .1); }
+.dock-filter svg { width: 15px; height: 15px; color: var(--muted); }
+.dock-filter input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 11.5px; }
+.dock-filter button { border: 0; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; padding: 0; }
+.dock-filter button svg { width: 13px; height: 13px; }
+.sidebar-closed .dock-filter { display: none; }
+
+.dock-group { display: flex; flex-direction: column; gap: 2px; margin-bottom: 9px; }
+.dock-group-label {
+  margin: 8px 6px 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: .04em;
+  opacity: .85;
+}
+.dock-group-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to left, transparent, var(--border)); }
+[dir='ltr'] .dock-group-label::after { background: linear-gradient(to right, transparent, var(--border)); }
+.sidebar-closed .dock-group-label { margin: 8px 8px; font-size: 0; gap: 0; }
+.sidebar-closed .dock-group-label::after { background: var(--border); }
+
+.dock-item {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background-color var(--wx-fast) var(--wx-swift), color var(--wx-fast) var(--wx-swift),
+    transform var(--wx-base) var(--wx-spring), box-shadow var(--wx-base) var(--wx-swift) !important;
+  animation: wx-nav-in .42s var(--wx-spring) both;
+  animation-delay: calc(var(--i, 0) * 22ms + 120ms);
+}
+@keyframes wx-nav-in { from { opacity: 0; transform: translateY(6px); } }
+.dock-item svg { transition: transform var(--wx-base) var(--wx-spring); }
+.dock-item:hover { transform: translateX(calc(var(--wx-dock-dir, 1) * 3px)); }
+.dock-item:hover svg { transform: scale(1.1); }
+.dock-item::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 34%;
+  width: 3px;
+  border-radius: 99px;
+  background: var(--wx-rail);
+  opacity: 0;
+  transform: scaleY(.2);
+  transition: opacity var(--wx-base) var(--wx-swift), transform var(--wx-base) var(--wx-spring);
+}
+.dock-item.active { transform: none; box-shadow: 0 10px 26px rgba(var(--cyan-rgb), .28); }
+.dock-item.active::before { opacity: 1; transform: scaleY(1); background: rgba(255, 255, 255, .85); }
+.dock-item.with-separator { margin-top: 0; }
+.dock-item.with-separator::before { content: ''; position: absolute; inset-inline: auto; inset-block: 34%; top: auto; height: auto; width: 3px; background: var(--wx-rail); }
+
+.dock-cue { margin-inline-start: auto; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0; transition: opacity var(--wx-fast) var(--wx-swift); }
+.dock-item.active .dock-cue { opacity: .85; }
+.sidebar-closed .dock-cue { display: none; }
+
+/* عند الطي تتحول القائمة إلى درج ينزلق، والزر العائم يعيدها */
+.sidebar-fab { transition: transform var(--wx-base) var(--wx-spring), box-shadow var(--wx-base) var(--wx-swift), border-color var(--wx-base) var(--wx-swift) !important; }
+.sidebar-fab svg { transition: transform var(--wx-base) var(--wx-spring); }
+.sidebar-fab:hover svg { transform: rotate(-90deg); }
+
+.dock-empty { padding: 18px 10px; text-align: center; color: var(--muted); font-size: 11px; }
+
+.dock-brand-button, .dock-toggle, .logout-mini { transition: transform var(--wx-base) var(--wx-spring), border-color var(--wx-base) var(--wx-swift), color var(--wx-base) var(--wx-swift); }
+.dock-brand-button:hover .brand-logo { transform: rotate(-3deg) scale(1.04); }
+.brand-logo { transition: transform var(--wx-slow) var(--wx-spring); }
+.dock-toggle:hover { transform: scale(1.08); color: var(--cyan); border-color: rgba(var(--cyan-rgb), .4); }
+.logout-mini { border: 1px solid transparent; border-radius: 10px; background: transparent; cursor: pointer; padding: 7px; color: var(--muted); }
+.logout-mini:hover { color: var(--coral); border-color: rgba(var(--coral-rgb), .3); background: rgba(var(--coral-rgb), .08); }
+
+/* =========================================================================
+   4) الشريط العلوي — شريط تقدّم القراءة وسلوك عند التمرير
+   ========================================================================= */
+
+.topbar { transition: box-shadow var(--wx-base) var(--wx-swift), background-color var(--wx-base) var(--wx-swift); }
+html.wx-scrolled .topbar { box-shadow: 0 18px 40px rgba(2, 8, 20, .28); }
+
+.wx-scroll-line { position: absolute; inset-inline: 16px; bottom: 0; height: 2px; border-radius: 99px; overflow: hidden; pointer-events: none; }
+.wx-scroll-line i { display: block; height: 100%; width: var(--wx-scroll); background: var(--wx-rail); border-radius: 99px; transition: width .1s linear; }
+
+.search-trigger { transition: border-color var(--wx-base) var(--wx-swift), background-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift); }
+.search-trigger:hover { border-color: rgba(var(--cyan-rgb), .4); color: var(--ink); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .07); }
+.search-trigger:hover svg { color: var(--cyan); }
+.search-trigger svg { transition: color var(--wx-base) var(--wx-swift); }
+
+.icon-btn { position: relative; overflow: hidden; }
+.icon-btn:active { transform: scale(.94); }
+.notification-count { animation: wx-pop .32s var(--wx-spring) both; }
+@keyframes wx-pop { from { opacity: 0; transform: scale(.5); } }
+.notification i { animation: wx-blip 2s ease-in-out infinite; }
+
+.user-chip-button { transition: transform var(--wx-base) var(--wx-spring), box-shadow var(--wx-base) var(--wx-swift); }
+.user-chip-button:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(var(--amber-rgb), .3); }
+
+.account-popover, .notification-popover { animation: wx-menu-in .22s var(--wx-spring) both !important; transform-origin: top var(--wx-origin, left); }
+[dir='rtl'] .account-popover, [dir='rtl'] .notification-popover { --wx-origin: right; }
+@keyframes wx-menu-in { from { opacity: 0; transform: translateY(-8px) scale(.97); } }
+.notification-item { transition: background-color var(--wx-fast) var(--wx-swift), transform var(--wx-fast) var(--wx-spring); }
+.notification-item:hover { transform: translateX(calc(var(--wx-dock-dir, 1) * 3px)); }
+
+/* =========================================================================
+   5) رؤوس الصفحات واللوحات — بنية بصرية أوضح
+   ========================================================================= */
+
+.page-head { position: relative; padding-inline-start: 14px; }
+.page-head::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 2px 10px;
+  width: 3px;
+  border-radius: 99px;
+  background: var(--wx-rail);
+  transform-origin: top;
+  animation: wx-rail-in .5s var(--wx-spring) .1s both;
+}
+@keyframes wx-rail-in { from { transform: scaleY(0); opacity: 0; } }
+.page-head h1 { animation: wx-rise .45s var(--wx-spring) .12s both; }
+.page-head p { animation: wx-rise .45s var(--wx-spring) .18s both; }
+.crumb .dot { animation: wx-blip 2.4s ease-in-out infinite; }
+
+.panel {
+  animation: wx-panel-in .46s var(--wx-spring) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+  transition: border-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift);
+}
+@keyframes wx-panel-in { from { opacity: 0; transform: translateY(12px); } }
+.panel:hover { border-color: var(--border-strong); }
+.panel-head { position: relative; }
+.panel-head h3 svg { color: var(--cyan); }
+
+/* بطاقات الأرقام: دخول متتابع + استجابة للمؤشر */
+.stat-card { animation: wx-panel-in .5s var(--wx-spring) both; transition: transform var(--wx-base) var(--wx-spring), box-shadow var(--wx-base) var(--wx-swift), border-color var(--wx-base) var(--wx-swift); }
+.stat-grid > *:nth-child(1) { animation-delay: .02s; }
+.stat-grid > *:nth-child(2) { animation-delay: .08s; }
+.stat-grid > *:nth-child(3) { animation-delay: .14s; }
+.stat-grid > *:nth-child(4) { animation-delay: .2s; }
+.stat-grid > *:nth-child(5) { animation-delay: .26s; }
+.stat-grid > *:nth-child(6) { animation-delay: .32s; }
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--lift); border-color: var(--border-strong); }
+.stat-card:hover .stat-icon { transform: scale(1.08) rotate(-4deg); }
+.stat-icon { transition: transform var(--wx-base) var(--wx-spring); }
+.stat-card::after { transition: opacity var(--wx-slow) var(--wx-swift), transform var(--wx-slow) var(--wx-spring); }
+.stat-card:hover::after { opacity: .45; transform: scale(1.15); }
+.stat-num { animation: wx-num-in .6s var(--wx-spring) .1s both; }
+@keyframes wx-num-in { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } }
+
+/* =========================================================================
+   6) الأزرار والحقول — استجابة فورية لفعل المستخدم
+   ========================================================================= */
+
+.btn { position: relative; overflow: hidden; transition: transform var(--wx-fast) var(--wx-spring), box-shadow var(--wx-base) var(--wx-swift), background-color var(--wx-base) var(--wx-swift), color var(--wx-base) var(--wx-swift), border-color var(--wx-base) var(--wx-swift) !important; }
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+  transform: skewX(-18deg);
+  opacity: 0;
+  transition: opacity var(--wx-fast) linear;
+}
+.btn-primary:hover:not(:disabled)::after { opacity: 1; animation: wx-sheen .75s var(--wx-swift); }
+@keyframes wx-sheen { to { inset-inline-start: 115%; } }
+.btn-primary:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(var(--cyan-rgb), .38); }
+.btn:active:not(:disabled) { transform: scale(.965) !important; }
+
+.wx-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .22;
+  pointer-events: none;
+  transform: scale(0);
+  animation: wx-ripple-out .55s var(--wx-swift) forwards;
+  z-index: 0;
+}
+@keyframes wx-ripple-out { to { transform: scale(1); opacity: 0; } }
+
+.chip { position: relative; overflow: hidden; transition: transform var(--wx-fast) var(--wx-spring), background-color var(--wx-base) var(--wx-swift), color var(--wx-base) var(--wx-swift), border-color var(--wx-base) var(--wx-swift); }
+.chip:hover { transform: translateY(-2px); color: var(--ink); border-color: rgba(var(--cyan-rgb), .35); }
+.chip.active { box-shadow: 0 10px 22px rgba(var(--cyan-rgb), .26); }
+
+.field span { transition: color var(--wx-fast) var(--wx-swift); }
+.field:focus-within span { color: var(--cyan); }
+.field input, .field select, .field textarea { transition: border-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift), background-color var(--wx-base) var(--wx-swift) !important; }
+.field input:focus, .field select:focus, .field textarea:focus { box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .14) !important; }
+.table-search { transition: border-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift); }
+.table-search:focus-within { border-color: rgba(var(--cyan-rgb), .45); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .1); }
+
+.switch i { transition: transform var(--wx-base) var(--wx-spring), background-color var(--wx-base) var(--wx-swift) !important; }
+
+/* =========================================================================
+   7) الجداول والقوائم — قراءة أسهل وحركة عند التفاعل
+   ========================================================================= */
+
+tbody tr { transition: background-color var(--wx-fast) var(--wx-swift), box-shadow var(--wx-fast) var(--wx-swift); }
+tbody tr:hover { box-shadow: inset 3px 0 0 var(--cyan); }
+[dir='ltr'] tbody tr:hover { box-shadow: inset -3px 0 0 var(--cyan); }
+th { transition: color var(--wx-fast) var(--wx-swift); }
+.patient-avatar { transition: transform var(--wx-base) var(--wx-spring); }
+tbody tr:hover .patient-avatar { transform: scale(1.08); }
+
+.doctor-card, .kanban-card, .clinic-card { transition: transform var(--wx-base) var(--wx-spring), box-shadow var(--wx-base) var(--wx-swift), border-color var(--wx-base) var(--wx-swift); }
+.kanban-card:hover { transform: translateY(-3px); box-shadow: var(--lift); }
+.kanban-col { transition: border-color var(--wx-base) var(--wx-swift), background-color var(--wx-base) var(--wx-swift); }
+
+.timeline-item { animation: wx-rise .4s var(--wx-spring) both; animation-delay: calc(var(--i, 0) * 35ms); }
+.activity-row { transition: background-color var(--wx-fast) var(--wx-swift), transform var(--wx-fast) var(--wx-spring); border-radius: 12px; }
+.activity-row:hover { background: var(--input); transform: translateX(calc(var(--wx-dock-dir, 1) * 3px)); }
+
+.empty-icon { animation: wx-breathe 3.4s ease-in-out infinite; }
+@keyframes wx-breathe { 50% { transform: scale(1.06); } }
+
+/* =========================================================================
+   8) النوافذ ولوحة الأوامر والتنبيهات
+   ========================================================================= */
+
+.modal-back, .cmdk-back { animation: wx-back-in .24s var(--wx-swift) both !important; }
+@keyframes wx-back-in { from { opacity: 0; backdrop-filter: blur(0); } }
+.modal { animation: wx-modal-in .38s var(--wx-spring) both !important; }
+@keyframes wx-modal-in { from { opacity: 0; transform: translateY(22px) scale(.965); } }
+.modal-close:hover { transform: rotate(90deg); border-color: rgba(var(--coral-rgb), .35); }
+.modal-close { transition: transform var(--wx-base) var(--wx-spring), color var(--wx-fast) var(--wx-swift), border-color var(--wx-fast) var(--wx-swift); }
+
+.cmdk-box { animation: wx-cmdk-in .3s var(--wx-spring) both; }
+@keyframes wx-cmdk-in { from { opacity: 0; transform: translateY(-14px) scale(.97); } }
+.cmdk-item { position: relative; overflow: hidden; transition: background-color var(--wx-fast) var(--wx-swift), transform var(--wx-fast) var(--wx-spring); animation: wx-rise .3s var(--wx-spring) both; animation-delay: calc(var(--i, 0) * 18ms); }
+.cmdk-item:hover { transform: translateX(calc(var(--wx-dock-dir, 1) * 3px)); }
+.cmdk-item:hover > svg { color: var(--emerald); }
+
+.toast-item { position: relative; overflow: hidden; animation: wx-toast-in .4s var(--wx-spring) both !important; }
+@keyframes wx-toast-in { from { opacity: 0; transform: translateY(16px) scale(.95); } }
+.toast-item::after { content: ''; position: absolute; inset-inline: 0; bottom: 0; height: 2px; background: var(--emerald); transform-origin: right; animation: wx-toast-life 2.8s linear forwards; }
+[dir='ltr'] .toast-item::after { transform-origin: left; }
+.toast-warn::after { background: var(--amber); }
+@keyframes wx-toast-life { to { transform: scaleX(0); } }
+
+.sidebar-fab { animation: wx-pop .4s var(--wx-spring) both; }
+.route-loading { animation: wx-rise .3s var(--wx-spring) both; }
+
+/* =========================================================================
+   9) شاشة الدخول — تسلسل ظهور منظم
+   ========================================================================= */
+
+.login-showcase .showcase-brandmark { animation: wx-rise .6s var(--wx-spring) .05s both; }
+.login-showcase .showcase-copy { animation: wx-rise .6s var(--wx-spring) .14s both; }
+.login-feature-grid article { animation: wx-rise .55s var(--wx-spring) both; transition: transform var(--wx-base) var(--wx-spring), border-color var(--wx-base) var(--wx-swift); }
+.login-feature-grid article:nth-child(1) { animation-delay: .22s; }
+.login-feature-grid article:nth-child(2) { animation-delay: .29s; }
+.login-feature-grid article:nth-child(3) { animation-delay: .36s; }
+.login-feature-grid article:nth-child(4) { animation-delay: .43s; }
+.login-feature-grid article:hover { transform: translateY(-3px); }
+.login-card-v2 { animation: wx-login-card .65s var(--wx-spring) .1s both; }
+@keyframes wx-login-card { from { opacity: 0; transform: translateY(20px) scale(.98); } }
+.login-heading { animation: wx-rise .5s var(--wx-spring) .26s both; }
+.login-card-v2 form .field { animation: wx-rise .5s var(--wx-spring) both; }
+.login-card-v2 form .field:nth-of-type(1) { animation-delay: .32s; }
+.login-card-v2 form .field:nth-of-type(2) { animation-delay: .39s; }
+.login-submit-v2 { animation: wx-rise .5s var(--wx-spring) .46s both; }
+.login-card-footer, .login-copyright { animation: wx-rise .5s var(--wx-spring) .54s both; }
+.login-status i { animation: wx-blip 1.8s ease-in-out infinite; }
+
+/* =========================================================================
+   10) احترام تفضيل تقليل الحركة + الطباعة
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .wx-boot-grid, .wx-boot-glow, .wx-boot-scan, .wx-boot-ring { animation: none !important; }
+  .dock-item:hover, .stat-card:hover, .kanban-card:hover, .activity-row:hover { transform: none !important; }
+}
+
+@media print {
+  .wx-boot, .wx-scroll-line, .dock-filter { display: none !important; }
+  .panel, .stat-card, .page-head h1, .page-head p, .dock-item, .cmdk-item, .timeline-item { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+@media (max-width: 900px) {
+  .sidebar-closed .dock-filter { display: flex; }
+  .sidebar-closed .dock-item { justify-content: flex-start; }
+  .sidebar-closed .dock-item::after { display: none; }
+  .sidebar-closed .dock-group-label { font-size: 9.5px; margin: 8px 6px 4px; }
+  .wx-boot-mark { width: 210px; height: 210px; }
+  .wx-boot-plate { width: 158px; height: 120px; }
+}
+
+/* =========================================================================
+   v4.3.87 — لوحة قوائم جديدة، بلا ظلال نص، وحركة أوسع داخل الواجهات
+   ========================================================================= */
+
+/* --- 1) إلغاء أي ظل خلف النصوص في كامل النظام --- */
+*, *::before, *::after { text-shadow: none !important; }
+.page-head h1, .page-head p, .panel-head h3, .dock-item span, .stat-num,
+.wx-boot-title, .wx-boot-sub, .login-card-v2 h2, .hospital-login-title {
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* --- 2) لوحة القوائم: بناء جديد بلوحة داخلية وبلاطات أيقونات --- */
+.dock {
+  border-radius: 26px !important;
+  background:
+    linear-gradient(180deg, rgba(var(--cyan-rgb), .07), transparent 32%),
+    var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .05), 0 20px 50px rgba(2, 8, 20, .26) !important;
+}
+html[data-theme='light'] .dock,
+html[data-theme='pearl'] .dock { box-shadow: 0 16px 40px rgba(30, 41, 59, .1) !important; }
+
+.dock-brand { min-height: 78px !important; border-bottom: 0 !important; }
+.brand-logo { width: 50px !important; height: 46px !important; border-radius: 14px !important; }
+.dock-brand b { font-size: 13.5px !important; letter-spacing: -.01em; }
+
+.dock-nav { padding: 4px 10px 14px !important; }
+
+.dock-group {
+  position: relative;
+  margin-bottom: 12px;
+  padding: 8px 6px 7px;
+  border-radius: 18px;
+  background: rgba(var(--cyan-rgb), .022);
+  border: 1px solid var(--border);
+}
+html[data-theme='light'] .dock-group,
+html[data-theme='pearl'] .dock-group { background: rgba(15, 23, 42, .02); }
+
+.dock-group-label {
+  margin: 2px 6px 7px !important;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.dock-group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.dock-group-label em {
+  font-style: normal;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--muted);
+  background: var(--input);
+  border: 1px solid var(--border);
+}
+
+.dock-item {
+  min-height: 46px !important;
+  padding: 6px 8px !important;
+  gap: 10px !important;
+  border-radius: 14px !important;
+  font-size: 12px !important;
+  color: var(--ink-soft) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.dock-ico {
+  width: 34px !important;
+  height: 34px !important;
+  flex: none;
+  opacity: 1 !important;
+  overflow: visible !important;
+  display: grid !important;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--muted);
+  background: var(--input);
+  border: 1px solid var(--border);
+  transition: background-color var(--wx-base) var(--wx-swift), color var(--wx-base) var(--wx-swift),
+    border-color var(--wx-base) var(--wx-swift), transform var(--wx-base) var(--wx-spring);
+}
+.dock-ico svg { width: 17px; height: 17px; }
+.dock-item:hover { background: var(--input) !important; color: var(--ink) !important; transform: none !important; }
+.dock-item:hover .dock-ico { color: var(--cyan); border-color: rgba(var(--cyan-rgb), .35); transform: translateY(-1px); }
+
+.dock-item.active {
+  color: var(--ink) !important;
+  background: linear-gradient(135deg, rgba(var(--cyan-rgb), .16), rgba(var(--emerald-rgb), .1)) !important;
+  border: 1px solid rgba(var(--cyan-rgb), .3) !important;
+  padding: 5px 7px !important;
+  box-shadow: none !important;
+}
+html[data-theme='aurora'] .dock-item.active { color: var(--ink) !important; }
+.dock-item.active .dock-ico {
+  color: #07222b;
+  background: linear-gradient(135deg, var(--cyan), var(--emerald));
+  border-color: transparent;
+}
+.dock-item.active::before {
+  opacity: 1;
+  transform: scaleY(1);
+  background: linear-gradient(180deg, var(--cyan), var(--emerald));
+  inset-block: 28%;
+  inset-inline-start: 0;
+  width: 3px;
+}
+.dock-item.active .dock-cue { opacity: 1; background: var(--emerald); box-shadow: 0 0 8px rgba(var(--emerald-rgb), .8); }
+
+.dock-filter { height: 40px; border-radius: 13px; margin-bottom: 12px; }
+
+.dock-footer {
+  margin: 0 10px 10px !important;
+  min-height: 62px !important;
+  padding: 10px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 18px;
+  background: var(--input);
+}
+.admin-avatar { border-radius: 13px !important; }
+
+/* --- 3) حركة أوسع داخل الواجهات --- */
+.stat-num[data-wx-count] { font-variant-numeric: tabular-nums; }
+
+.meter i, .meter-row em { transition: width .9s var(--wx-spring); animation: wx-meter .9s var(--wx-spring) both; }
+@keyframes wx-meter { from { width: 0 !important; } }
+.bar-item i { animation: wx-bar .8s var(--wx-spring) both; }
+.bar-item:nth-child(2) i { animation-delay: .06s; } .bar-item:nth-child(3) i { animation-delay: .12s; }
+.bar-item:nth-child(4) i { animation-delay: .18s; } .bar-item:nth-child(5) i { animation-delay: .24s; }
+.bar-item:nth-child(6) i { animation-delay: .3s; } .bar-item:nth-child(n+7) i { animation-delay: .36s; }
+@keyframes wx-bar { from { height: 0 !important; opacity: .3; } }
+.bar-item:hover i { filter: brightness(1.15); }
+.donut { animation: wx-pop .6s var(--wx-spring) both; }
+
+tbody tr { animation: wx-row-in .38s var(--wx-spring) both; }
+@keyframes wx-row-in { from { opacity: 0; transform: translateY(6px); } }
+tbody tr:nth-child(1) { animation-delay: .02s; } tbody tr:nth-child(2) { animation-delay: .05s; }
+tbody tr:nth-child(3) { animation-delay: .08s; } tbody tr:nth-child(4) { animation-delay: .11s; }
+tbody tr:nth-child(5) { animation-delay: .14s; } tbody tr:nth-child(6) { animation-delay: .17s; }
+tbody tr:nth-child(7) { animation-delay: .2s; } tbody tr:nth-child(8) { animation-delay: .23s; }
+tbody tr:nth-child(n+9) { animation-delay: .26s; }
+
+.badge { transition: transform var(--wx-fast) var(--wx-spring); }
+tbody tr:hover .badge, .stat-card:hover .badge { transform: scale(1.06); }
+.status-pill.active i { animation: wx-blip 1.8s ease-in-out infinite; }
+.doctor-card:hover .patient-avatar, .doctor-card:hover .clinic-icon { transform: scale(1.06) rotate(-3deg); }
+.clinic-icon { transition: transform var(--wx-base) var(--wx-spring); }
+.summary-list > div, .pt-stats-breakdown span, .finance-live-calc article, .engineer-summary-grid .panel {
+  animation: wx-rise .42s var(--wx-spring) both;
+  transition: border-color var(--wx-base) var(--wx-swift), transform var(--wx-base) var(--wx-spring);
+}
+.summary-list > div:hover, .finance-live-calc article:hover { transform: translateY(-2px); border-color: rgba(var(--cyan-rgb), .3); }
+.kanban-col { animation: wx-panel-in .5s var(--wx-spring) both; }
+.kanban-col:nth-child(2) { animation-delay: .07s; } .kanban-col:nth-child(3) { animation-delay: .14s; }
+.region-box, .quality-card, .access-summary .panel { animation: wx-rise .42s var(--wx-spring) both; }
+.check-box, .permission-cell i { transition: transform var(--wx-fast) var(--wx-spring), background-color var(--wx-fast) var(--wx-swift); }
+.permission-cell input:checked + i { animation: wx-pop .3s var(--wx-spring); }
+.table-actions .btn:hover { transform: translateY(-2px); }
+.head-actions .btn { animation: wx-rise .45s var(--wx-spring) both; }
+.head-actions .btn:nth-child(2) { animation-delay: .06s; }
+.head-actions .btn:nth-child(3) { animation-delay: .12s; }
+.spin { animation: access-spin .8s linear infinite !important; }
+
+/* --- 4) شاشة الدخول: حركة وتفاعل --- */
+.login-page { --wx-mx: 0; --wx-my: 0; }
+.login-orb-a, .login-orb-b { animation: wx-orb 14s ease-in-out infinite alternate !important; }
+.login-orb-b { animation-duration: 18s !important; animation-direction: alternate-reverse !important; }
+@keyframes wx-orb { to { transform: translate3d(6vmin, -5vmin, 0) scale(1.14); } }
+.login-grid-pattern {
+  animation: wx-grid-drift 22s linear infinite;
+  transform: translate3d(calc(var(--wx-mx) * -14px), calc(var(--wx-my) * -14px), 0);
+}
+.login-showcase {
+  transform: translate3d(calc(var(--wx-mx) * 8px), calc(var(--wx-my) * 8px), 0);
+  transition: transform .5s var(--wx-swift);
+}
+.login-card-v2 {
+  transform: translate3d(calc(var(--wx-mx) * -6px), calc(var(--wx-my) * -6px), 0);
+  transition: transform .5s var(--wx-swift);
+}
+.showcase-brandmark span { transition: transform var(--wx-slow) var(--wx-spring); }
+.showcase-brandmark:hover span { transform: rotate(-4deg) scale(1.05); }
+.hospital-login-title { animation: wx-title-in .8s var(--wx-spring) .2s both; }
+@keyframes wx-title-in { from { opacity: 0; transform: translateY(16px); clip-path: inset(0 0 100% 0); } }
+.login-feature-grid article span { transition: transform var(--wx-base) var(--wx-spring), color var(--wx-base) var(--wx-swift); }
+.login-feature-grid article:hover span { transform: translateY(-2px) scale(1.08); color: var(--cyan); }
+.login-input-shell { transition: border-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift), transform var(--wx-base) var(--wx-spring); }
+.login-input-shell:focus-within { transform: translateY(-1px); box-shadow: 0 0 0 3px rgba(var(--cyan-rgb), .13); }
+.login-input-shell .input-action svg { transition: transform var(--wx-base) var(--wx-spring), color var(--wx-base) var(--wx-swift); }
+.login-input-shell:focus-within .input-action svg { transform: scale(1.14); color: var(--cyan); }
+.password-toggle { transition: transform var(--wx-fast) var(--wx-spring), color var(--wx-fast) var(--wx-swift); }
+.password-toggle:active { transform: scale(.88); }
+.login-submit-v2 { position: relative; overflow: hidden; }
+.login-submit-v2:disabled { opacity: .85 !important; }
+.login-submit-v2:disabled::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .35), transparent);
+  animation: wx-loading-sweep 1.1s linear infinite;
+}
+@keyframes wx-loading-sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.login-error { animation: wx-shake .42s var(--wx-swift) both; }
+@keyframes wx-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.login-language, .login-theme-toggle { transition: transform var(--wx-base) var(--wx-spring), color var(--wx-base) var(--wx-swift), border-color var(--wx-base) var(--wx-swift); }
+.login-language:hover, .login-theme-toggle:hover { transform: translateY(-2px); color: var(--cyan); }
+.showcase-pulse > span { animation: wx-blip 1.6s ease-in-out infinite; }
+.showcase-pulse > span:nth-child(3) { animation-delay: .2s; }
+.showcase-pulse > span:nth-child(4) { animation-delay: .4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-showcase, .login-card-v2, .login-grid-pattern { transform: none !important; }
+  tbody tr, .bar-item i, .meter i, .meter-row em { animation: none !important; }
+}
+
+/* --- تصحيحات بنية اللوحة: زر الطي في صف الشعار، وعدم انكماش عناصر القائمة --- */
+.dock-toggle {
+  position: absolute !important;
+  inset-block-start: 24px !important;
+  inset-inline-end: 14px !important;
+  width: 31px !important;
+  height: 31px !important;
+  z-index: 5;
+}
+.dock-brand { padding-inline-end: 54px !important; }
+.dock-nav { flex: 1 1 auto !important; min-height: 0 !important; }
+.dock-filter { flex: none !important; height: 40px !important; }
+.dock-group { flex: none !important; }
+.dock-item { flex: none !important; }
+.dock-footer { flex: none !important; }
+
+/* =========================================================================
+   v4.3.88 — إصلاح خيال القائمة + هوية بصرية متحركة للدخول والواجهات
+   ========================================================================= */
+
+/* --- 1) إصلاح: حقل التصفية كان يلتصق بالأعلى بخلفية شفافة فتمر العناصر تحته --- */
+.dock-filter {
+  position: static !important;
+  background: var(--solid) !important;
+  border: 1px solid var(--border-strong) !important;
+  margin: 2px 0 12px !important;
+}
+.dock-nav { overflow-x: hidden !important; }
+.dock-group, .dock-item { position: relative; z-index: 1; }
+
+/* --- 2) خلفية متحركة هادئة لكل واجهات النظام --- */
+.workspace::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(48vmax 38vmax at 82% -6%, rgba(var(--cyan-rgb), .14), transparent 62%),
+    radial-gradient(42vmax 36vmax at 6% 96%, rgba(var(--violet-rgb), .13), transparent 62%),
+    radial-gradient(34vmax 30vmax at 48% 52%, rgba(var(--emerald-rgb), .07), transparent 66%);
+  animation: wx-ambient 26s ease-in-out infinite alternate;
+}
+@keyframes wx-ambient {
+  50% { transform: translate3d(-2.5vmax, 2vmax, 0) scale(1.06); }
+  100% { transform: translate3d(2vmax, -2.5vmax, 0) scale(1.03); }
+}
+.workspace::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .7;
+  background-image:
+    linear-gradient(to right, rgba(var(--cyan-rgb), .06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--cyan-rgb), .06) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: radial-gradient(90% 70% at 50% 0%, #000, transparent 75%);
+  -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000, transparent 75%);
+}
+html[data-theme='light'] .workspace::after,
+html[data-theme='pearl'] .workspace::after { opacity: .75; }
+
+/* اللوحات: حدّ علوي مضيء يظهر عند المرور */
+.panel { position: relative; }
+.panel::after {
+  content: '';
+  position: absolute;
+  inset-inline: 18%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--cyan-rgb), .55), transparent);
+  opacity: 0;
+  transition: opacity var(--wx-base) var(--wx-swift), inset-inline var(--wx-slow) var(--wx-spring);
+  pointer-events: none;
+}
+.panel:hover::after { opacity: 1; inset-inline: 6%; }
+
+/* --- 3) شاشة الدخول: خلفية حيّة وبطاقة بإطار متحرك --- */
+.login-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 34vmax at 78% 12%, rgba(var(--cyan-rgb), .16), transparent 60%),
+    radial-gradient(34vmax 32vmax at 18% 88%, rgba(var(--violet-rgb), .16), transparent 60%),
+    radial-gradient(30vmax 26vmax at 52% 42%, rgba(var(--emerald-rgb), .08), transparent 62%);
+  animation: wx-ambient 20s ease-in-out infinite alternate;
+}
+.login-showcase, .login-card-v2, .login-orb, .login-grid-pattern { position: relative; z-index: 1; }
+
+.login-card-v2 { position: relative; }
+.login-card-v2::after {
+  content: '';
+  position: absolute;
+  inset-inline: 12%;
+  top: 0;
+  height: 2px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--emerald), transparent);
+  animation: wx-card-edge 5s var(--wx-swift) infinite;
+  pointer-events: none;
+}
+@keyframes wx-card-edge {
+  0%, 100% { opacity: .35; inset-inline: 26%; }
+  50% { opacity: 1; inset-inline: 8%; }
+}
+.login-card-v2 { animation: wx-login-card .65s var(--wx-spring) .1s both, wx-card-glow 6s ease-in-out 1s infinite; }
+@keyframes wx-card-glow {
+  50% { box-shadow: 0 26px 70px rgba(2, 10, 24, .5), 0 0 0 1px rgba(var(--cyan-rgb), .22); }
+}
+
+.showcase-brandmark span { position: relative; }
+.showcase-brandmark span::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1px solid rgba(var(--cyan-rgb), .45);
+  animation: wx-halo 2.8s var(--wx-swift) infinite;
+  pointer-events: none;
+}
+@keyframes wx-halo { 0% { opacity: .7; transform: scale(.94); } 70%, 100% { opacity: 0; transform: scale(1.18); } }
+
+.login-feature-grid article {
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--wx-base) var(--wx-spring), border-color var(--wx-base) var(--wx-swift), background-color var(--wx-base) var(--wx-swift);
+}
+.login-feature-grid article::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -55%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(var(--cyan-rgb), .16), transparent);
+  transform: skewX(-16deg);
+  opacity: 0;
+}
+.login-feature-grid article:hover { border-color: rgba(var(--cyan-rgb), .4) !important; }
+.login-feature-grid article:hover::after { opacity: 1; animation: wx-sheen .8s var(--wx-swift); }
+
+.login-status { position: relative; }
+.login-eyebrow svg { animation: wx-breathe 3s ease-in-out infinite; }
+
+@media print {
+  .workspace::before, .workspace::after, .login-page::before { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace::before, .workspace::after, .login-page::before,
+  .login-card-v2::before, .showcase-brandmark span::after { animation: none !important; }
+}
+
+/* =========================================================================
+   v4.3.90 — تهذيب الواجهات: إيقاع طباعي أوضح ومسافات أهدأ
+   ========================================================================= */
+
+/* رأس الصفحة: هرمية أوضح ومسافة تنفّس أكبر */
+.page-head { margin: 26px 0 26px !important; padding-inline-start: 16px !important; align-items: flex-start !important; }
+.page-head h1 { font-size: clamp(23px, 2vw, 30px) !important; line-height: 1.35 !important; letter-spacing: -.015em; font-weight: 800; }
+.page-head p { max-width: 68ch; font-size: 12.5px !important; line-height: 1.85 !important; margin-top: 9px !important; }
+.crumb { font-size: 10.5px !important; letter-spacing: 0 !important; opacity: .95; }
+
+/* اللوحات: حدود أرفع، رؤوس بخط فاصل، ومسافات داخلية أوسع */
+.panel { padding: clamp(18px, 1.6vw, 26px) !important; border-radius: 22px !important; }
+.panel-head {
+  margin-bottom: 18px !important;
+  padding-bottom: 13px !important;
+  border-bottom: 1px solid var(--border);
+  align-items: center !important;
+}
+.panel-head h3 { font-size: 14px !important; font-weight: 800; letter-spacing: -.01em; }
+.panel-head span { font-size: 11px !important; color: var(--muted); }
+
+/* بطاقات الأرقام: أرقام أكبر وتسميات أهدأ بدل التوهج الثقيل */
+.stat-card { border-radius: 22px !important; min-height: 150px !important; }
+.stat-card::after { opacity: .18 !important; }
+.stat-card:hover::after { opacity: .3 !important; }
+.stat-num { font-size: clamp(26px, 2.3vw, 33px) !important; letter-spacing: -.02em; margin-top: 18px !important; }
+.stat-card > span { font-size: 11.5px !important; color: var(--muted) !important; margin-top: 6px !important; }
+.stat-icon { width: 38px !important; height: 38px !important; border-radius: 12px !important; }
+.stat-icon svg { width: 17px; height: 17px; }
+
+/* الجداول: مسافات أوسع، رؤوس أهدأ، وصفوف أسهل في القراءة */
+th {
+  padding: 13px 12px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: var(--muted) !important;
+  border-bottom: 1px solid var(--border-strong) !important;
+}
+td { padding: 14px 12px !important; font-size: 12.5px !important; line-height: 1.7 !important; }
+tbody tr:hover { background: rgba(var(--cyan-rgb), .045) !important; }
+.patient-cell b { font-size: 12.5px; }
+
+/* الأزرار والشارات: أحجام متناسقة عبر النظام */
+.btn { border-radius: 12px !important; padding: 11px 17px !important; font-size: 12px !important; font-weight: 800 !important; }
+.btn-sm { padding: 8px 12px !important; font-size: 11px !important; }
+.badge { padding: 5px 10px !important; font-size: 10.5px !important; font-weight: 800 !important; }
+
+/* الحقول: ارتفاع موحّد وحواف أنعم */
+.field > span { font-size: 11px !important; font-weight: 700 !important; }
+.field input, .field select { min-height: 44px !important; border-radius: 12px !important; font-size: 12.5px !important; }
+.field textarea { border-radius: 12px !important; font-size: 12.5px !important; line-height: 1.8 !important; }
+
+/* الشريط العلوي: أهدأ وأكثر اتزاناً */
+.topbar { height: 64px !important; border-radius: 18px !important; }
+.search-trigger { border-radius: 13px !important; font-size: 12px; }
+.icon-btn { border-radius: 12px !important; }
+
+/* حالة الفراغ: دعوة للفعل بدل رسالة باهتة */
+.empty-state h4 { font-size: 15px !important; }
+.empty-state p { font-size: 12px !important; line-height: 1.85 !important; }
+
+/* =========================================================================
+   v4.3.90 — انضباط الخط والأيقونات عبر كل الواجهات
+   ========================================================================= */
+
+/* الأيقونات: مقاس موحّد، ولا تنكمش داخل الصفوف المزدحمة (سبب اختفائها) */
+.content svg, .topbar svg, .modal svg, .panel svg, .dock svg {
+  flex: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.btn svg, .icon-btn svg, .chip svg, .table-actions svg, .panel-head svg,
+.field svg, .table-search svg, .activity-row svg, .cmdk-item svg { width: 17px !important; height: 17px !important; }
+.page-head svg, .stat-icon svg { width: 19px !important; height: 19px !important; }
+.badge svg, .status-pill svg, .crumb svg { width: 13px !important; height: 13px !important; }
+.icon-btn, .table-actions .btn { display: inline-flex !important; align-items: center; justify-content: center; }
+.btn { display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; }
+.panel-head h3, .page-head .crumb, .activity-row > span { display: flex; align-items: center; gap: 8px; }
+/* أي أيقونة بلا لون صريح ترث لون النص بدل أن تبهت */
+.content svg:not([fill]) { color: inherit; }
+
+/* سلّم خطوط موحّد */
+.page-head h1 { font-size: clamp(22px, 2vw, 28px) !important; font-weight: 800 !important; letter-spacing: -.015em; line-height: 1.35 !important; }
+.page-head p { font-size: 12.5px !important; line-height: 1.75 !important; }
+.crumb { font-size: 11px !important; font-weight: 800 !important; letter-spacing: .01em; }
+.panel-head h3 { font-size: 14px !important; font-weight: 800 !important; letter-spacing: -.01em; }
+.panel-head span, .panel-head small { font-size: 11px !important; }
+.stat-num { font-size: clamp(24px, 2.2vw, 31px) !important; font-weight: 850 !important; letter-spacing: -.02em; }
+.stat-card > span, .stat-card small { font-size: 11.5px !important; }
+table { font-size: 12.5px !important; }
+thead th { font-size: 11px !important; font-weight: 800 !important; letter-spacing: .015em; }
+tbody td { line-height: 1.65 !important; }
+.field > span { font-size: 11.5px !important; font-weight: 700 !important; }
+.field input, .field select, .field textarea { font-size: 12.5px !important; }
+.btn { font-size: 12.5px !important; font-weight: 800 !important; }
+.badge, .status-pill { font-size: 10.5px !important; font-weight: 800 !important; letter-spacing: .01em; }
+.dock-item span { font-size: 12px !important; font-weight: 700 !important; }
+
+/* وضوح النص: رفع تباين اللون الباهت قليلاً */
+html[data-theme='dark'] { --muted: #9aadc2; }
+html[data-theme='aurora'] { --muted: #a3aed0; }
+html[data-theme='light'], html[data-theme='pearl'] { --muted: #566b80; }
+
+/* الأرقام واللاتيني داخل النص العربي يبقى بمحاذاة سليمة */
+[dir='rtl'] table td, [dir='rtl'] table th { text-align: start; }
+.stat-num, .lx-stamp b, td[dir='ltr'] { font-variant-numeric: tabular-nums; }
+
+/* =========================================================================
+   v4.3.92 — إصلاح الخيال خلف الأسطح الطافية
+   السبب: تأثير الزجاج (backdrop blur) معطّل في النظام لأسباب أداء، لكن خلفية
+   الأسطح بقيت شبه شفافة (4.5% أبيض). فالشريط العلوي اللاصق وأي قائمة طافية
+   يمر المحتوى من تحتها ويظهر كنص مزدوج عند التمرير أو البحث.
+   الحل: خلفية معتمة كاملة لكل سطح لاصق أو طافٍ.
+   ========================================================================= */
+
+.topbar,
+.topbar.glass {
+  background: var(--solid) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 28px rgba(2, 8, 20, .3) !important;
+}
+html[data-theme='light'] .topbar,
+html[data-theme='pearl'] .topbar,
+html[data-theme='light'] .topbar.glass,
+html[data-theme='pearl'] .topbar.glass { box-shadow: 0 10px 26px rgba(30, 60, 90, .1) !important; }
+html.wx-scrolled .topbar { box-shadow: 0 16px 36px rgba(2, 8, 20, .4) !important; }
+
+/* لوحة البحث (Ctrl+K) وكل القوائم المنسدلة والطافية */
+.cmdk-box, .cmdk-box.glass, .cmdk-box.glass-strong,
+.account-popover, .notification-popover,
+.modal, .modal.glass-strong,
+.search-results, .suggest-list, .autocomplete-panel, .dropdown-panel {
+  background: var(--solid) !important;
+  border: 1px solid var(--border-strong) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* حقول البحث داخل اللوحات: خلفية معتمة حتى لا تشف عند التمرير */
+.table-search, .search-trigger, .dock-filter, .lx-input {
+  background: var(--input) !important;
+  backdrop-filter: none !important;
+}
+html[data-theme='dark'] .table-search,
+html[data-theme='aurora'] .table-search { background: #1a2338 !important; }
+html[data-theme='light'] .table-search,
+html[data-theme='pearl'] .table-search { background: #fff !important; }
+
+/* رؤوس الجداول اللاصقة: خلفية معتمة بدل التدرج الشفاف */
+.pt-patients-table thead th,
+.pt-assign-list-table .head,
+.permission-head,
+.engineer-table th,
+.account-lines-editor th {
+  background: var(--solid) !important;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+/* أي عنصر لاصق آخر يأخذ خلفية معتمة تلقائياً */
+.panel [style*="position:sticky"], .panel [style*="position: sticky"] { background: var(--solid); }
+
+/* =========================================================================
+   v4.3.92 — لوحة القوائم: تهدئة الضجيج البصري بدل تكديس الصناديق
+   المشكلة السابقة: صندوق مجموعة + بلاطة أيقونة + حدود لكل عنصر = صناديق
+   داخل صناديق. الحل: بنية طباعية هادئة، وحالة نشطة واحدة قوية وواضحة.
+   ========================================================================= */
+
+.dock { border-radius: 24px !important; }
+
+/* المجموعات: عناوين هادئة بلا صناديق */
+.dock-group {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 0 14px !important;
+}
+.dock-group-label {
+  margin: 0 12px 6px !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: .62;
+}
+.dock-group-label::after { display: none !important; }
+.dock-group-label em {
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  font-size: 9px !important;
+  opacity: .7;
+}
+
+/* العناصر: أيقونة مجردة ونص واضح */
+.dock-item {
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  gap: 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid transparent !important;
+  color: var(--muted) !important;
+}
+.dock-ico {
+  width: 20px !important;
+  height: 20px !important;
+  border: 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+  color: inherit;
+}
+.dock-ico svg { width: 18px !important; height: 18px !important; }
+.dock-item span { font-size: 12.5px !important; font-weight: 700 !important; }
+
+.dock-item:hover { background: var(--input) !important; color: var(--ink) !important; }
+.dock-item:hover .dock-ico { color: var(--ink); transform: none; }
+
+/* حالة نشطة واحدة قوية: خلفية صلبة + شريط جانبي + نص أبيض */
+.dock-item.active {
+  color: var(--ink) !important;
+  background: linear-gradient(90deg, rgba(var(--cyan-rgb), .2), rgba(var(--cyan-rgb), .07)) !important;
+  border: 1px solid rgba(var(--cyan-rgb), .28) !important;
+  padding: 0 12px !important;
+  font-weight: 800 !important;
+}
+[dir='ltr'] .dock-item.active { background: linear-gradient(270deg, rgba(var(--cyan-rgb), .2), rgba(var(--cyan-rgb), .07)) !important; }
+.dock-item.active .dock-ico { color: var(--cyan); background: none; border: 0; }
+.dock-item.active span { color: var(--ink) !important; }
+.dock-item.active::before {
+  opacity: 1;
+  transform: scaleY(1);
+  inset-block: 22%;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--cyan);
+}
+[dir='rtl'] .dock-item.active::before { border-radius: 3px 0 0 3px; }
+.dock-item.active .dock-cue { display: none; }
+
+/* الرأس والتذييل */
+.dock-brand { min-height: 72px !important; }
+.dock-nav { padding: 6px 8px 12px !important; }
+.dock-filter { margin: 0 4px 14px !important; height: 38px !important; border-radius: 11px !important; }
+.dock-footer {
+  margin: 0 8px 10px !important;
+  padding: 10px !important;
+  border-radius: 14px !important;
+  background: var(--input) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* =========================================================================
+   v4.3.93 — إصلاح تداخل النص مع الأيقونات عند تغيير اتجاه الصفحة
+   السبب: أيقونات البطاقات موضوعة باتجاه فيزيائي ثابت (left) بدل اتجاه منطقي.
+   في العربية (RTL) تقع بعيداً عن النص، وفي الإنجليزية (LTR) تقع فوقه تماماً.
+   الحل: اتجاه منطقي (inset-inline-end) + مساحة محجوزة للنص في الحالتين.
+   ========================================================================= */
+
+.archive-stats .panel {
+  padding-inline-end: 74px !important;
+  padding-block: 18px !important;
+  gap: 8px;
+}
+.archive-stats .panel svg {
+  left: auto !important;
+  right: auto !important;
+  inset-inline-end: 20px !important;
+  inset-block-end: 50% !important;
+  transform: translateY(50%);
+}
+.archive-stats .panel span {
+  display: block;
+  font-size: 12px !important;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+.archive-stats .panel b { font-size: 30px !important; }
+
+/* أي بطاقة إحصائية فيها أيقونة مطلقة تأخذ نفس المعالجة */
+.stat-card, .engineer-summary-grid .panel, .pt-stat-cards.compact span {
+  padding-inline-end: 68px;
+  position: relative;
+}
+.stat-card > svg, .engineer-summary-grid .panel > svg {
+  left: auto !important;
+  right: auto !important;
+  inset-inline-end: 18px !important;
+}
+
+/* نصوص البطاقات لا تُقصّ ولا تتراكب مهما طال النص الإنجليزي */
+.stat-card span, .stat-card small,
+.engineer-summary-grid .panel span,
+.pt-stat-cards.compact small {
+  min-width: 0;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* القوائم المنسدلة المثبتة باتجاه فيزيائي */
+.finance-patient-results { right: auto !important; left: auto !important; inset-inline: 0 !important; }
+
+/* =========================================================================
+   v4.3.94 — إصلاح خروج بطاقات شاشة المبيت خارج حدود الصفحة
+   السبب: أعمدة الشبكة تسمح بالانكماش minmax(0,1fr)، لكن الأزرار نفسها تبقى
+   بعرض min-width:auto، ونصها الطويل داخل عمود 1fr يفرض عرضاً أدنى أكبر من
+   العمود، فتتمدد البطاقات خارج الحاوية وتُقص الأيقونات عند الحافة.
+   الحل: السماح للأزرار ومحتواها بالانكماش (min-width:0) + التفاف النص +
+   شبكة تتجاوب تلقائياً بدل عدد أعمدة ثابت.
+   ========================================================================= */
+
+.legacy-inpatient-console, .legacy-inpatient-console > * { min-width: 0 !important; }
+
+.legacy-inpatient-actions {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+  gap: 10px !important;
+}
+.legacy-inpatient-actions > button {
+  min-width: 0 !important;
+  overflow: hidden;
+}
+.legacy-inpatient-actions > button > * { min-width: 0 !important; }
+
+.dashboard-module { min-width: 0 !important; }
+.dashboard-module > div, .dashboard-module b, .dashboard-module small, .dashboard-module span {
+  min-width: 0 !important;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+.dashboard-module b { font-size: 12.5px !important; line-height: 1.45; }
+.dashboard-module small { font-size: 10.5px !important; line-height: 1.5; }
+.dashboard-module svg { flex: none; }
+
+/* نفس المعالجة للشبكات الأخرى التي قد تتمدد بنصوص طويلة */
+.inpatient-choice-grid, .inpatient-registry-grid, .engineer-summary-grid, .stat-grid, .archive-stats {
+  min-width: 0;
+}
+.inpatient-choice-grid > *, .inpatient-registry-grid > *,
+.engineer-summary-grid > *, .stat-grid > *, .archive-stats > * { min-width: 0 !important; }
+
+@media (max-width: 1280px) {
+  .legacy-inpatient-actions { grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)) !important; }
+}
+
+
+/* =========================================================================
+   v4.3.96 — حماية عامة من تمدد الشبكات خارج حدود الصفحة
+   نفس الخلل الذي ظهر في شاشة المبيت موجود بنيوياً في 287 شبكة:
+   عناصر الشبكة تبقى بعرض min-width:auto، فأي نص طويل داخلها يفرض عرضاً أدنى
+   أكبر من عمودها فتخرج عن الحاوية ويُقص محتواها عند الحافة.
+   الحل مطبّق مرة واحدة على كل الشبكات بدل معالجتها حالة بحالة.
+   ========================================================================= */
+
+.access-loading,
+.access-summary,
+.account-avatar,
+.account-edit-grid,
+.account-preview-bottom,
+.account-preview-custom,
+.account-preview-head,
+.activity-row,
+.admin-avatar,
+.app-splash,
+.archive-detail-grid,
+.archive-filters,
+.archive-layout,
+.archive-stats,
+.balance-check,
+.billing-grid,
+.bottom,
+.brand-logo,
+.check-box,
+.checkbox-grid,
+.clinic-icon,
+.compact,
+.coverage,
+.dashboard-module,
+.dashboard-module-icon,
+.dashboard-module-strip,
+.dashboard-welcome,
+.declaration-form-grid,
+.declaration-history,
+.declaration-patient-results,
+.dental-clinic-page,
+.dental-grid,
+.dental-summary,
+.department-permission-grid,
+.detail-grid,
+.diagnostic-catalog-manager,
+.diagnostic-catalog-toolbar,
+.diagnostic-grid,
+.diagnostic-overview,
+.diagnostic-test-row,
+.diagnostics-form-grid,
+.discharge-preview-sign,
+.discharge-preview-summary,
+.dock-toggle,
+.doctor-grid,
+.doctor-kpis,
+.donut,
+.dual-range,
+.elderly-check-card,
+.elderly-filter-grid,
+.elderly-form-grid,
+.elderly-numbered-list,
+.elderly-numbered-row,
+.elderly-page,
+.elderly-stat-card,
+.elderly-stats-grid,
+.elderly-status-box,
+.empty-icon,
+.engineer-summary-grid,
+.engineer-trash-card,
+.engineer-trash-page,
+.engineer-trash-summary,
+.enhanced,
+.finance-account-layout,
+.finance-add-coverage,
+.finance-age-stats,
+.finance-alert-rail,
+.finance-case-strip,
+.finance-check-grid,
+.finance-choice-add,
+.finance-choice-grid,
+.finance-claim-dates,
+.finance-claim-kpis,
+.finance-claim-layout,
+.finance-claim-patient,
+.finance-core-fields,
+.finance-custom-fields,
+.finance-custom-list,
+.finance-export-options,
+.finance-grid,
+.finance-grid-two,
+.finance-hero-mark,
+.finance-history-index,
+.finance-history-list,
+.finance-kpis,
+.finance-linked-patient,
+.finance-live-calc,
+.finance-lookup-copy,
+.finance-mini-list,
+.finance-one-amount-form,
+.finance-patient-lookup,
+.finance-report-filters,
+.finance-reports-layout,
+.finance-rules,
+.finance-section-tabs,
+.finance-shell,
+.finance-stat-grid,
+.financial-declaration-layout,
+.financial-declaration-shell,
+.followup-grid,
+.form-actions,
+.form-grid,
+.health-merge-box,
+.identity-lookup-row,
+.identity-row,
+.inline-input-action,
+.inpatient-admin-form-grid,
+.inpatient-admin-kpis,
+.inpatient-admin-request-list,
+.inpatient-card-table,
+.inpatient-case-grid,
+.inpatient-choice-add,
+.inpatient-choice-grid,
+.inpatient-choice-options,
+.inpatient-filter-grid,
+.inpatient-hero-orbit,
+.inpatient-identity-search,
+.inpatient-kpis,
+.inpatient-module-switcher,
+.inpatient-module-switcher-five,
+.inpatient-module-switcher-four,
+.inpatient-module-switcher-seven,
+.inpatient-module-switcher-six,
+.inpatient-module-switcher-three,
+.inpatient-registry-grid,
+.inpatient-registry-placeholder,
+.inpatient-request-grid,
+.inpatient-step-no,
+.inpatient-ward-toggle,
+.inquiries-kpis,
+.kanban-board,
+.kpi-icon,
+.lab-kpis,
+.lab-order-summary,
+.lab-result-row,
+.legacy-action-editor-grid,
+.legacy-action-finance-shortcuts,
+.legacy-filter-title,
+.legacy-finance-strip,
+.legacy-inpatient-actions,
+.legacy-inpatient-console,
+.legacy-inpatient-filter,
+.login-feature-grid,
+.login-mobile-brand,
+.login-v2,
+.logout-mini,
+.mini-box,
+.mini-head,
+.mobile-menu,
+.modal-close,
+.moh-current-list,
+.moh-hero-mark,
+.moh-id-lookup,
+.moh-kpis,
+.moh-portal-shell,
+.moh-report-panel,
+.moh-wait-list,
+.needs-branches-grid,
+.needs-branches-panel,
+.needs-line,
+.needs-list,
+.needs-numbered-list-fixed,
+.needs-rtl-list,
+.nested-grid,
+.notification-count,
+.notification-empty,
+.operations-form,
+.operations-layout,
+.operations-patient-card,
+.operations-search-row,
+.panel,
+.password-toggle,
+.patient-diagnostics-grid,
+.patient-timeline,
+.payment-method-switch,
+.payment-toggle,
+.permission-row,
+.profile-grid,
+.pt-add-therapist,
+.pt-assign-list-table,
+.pt-assigned-patients,
+.pt-assignment-modal-tools,
+.pt-assignment-toolbar,
+.pt-case-grid,
+.pt-case-identifiers,
+.pt-check,
+.pt-days-picker,
+.pt-demographics,
+.pt-diagnosis-add,
+.pt-diagnosis-list,
+.pt-extra-fields-box,
+.pt-hero,
+.pt-hero-stats,
+.pt-id-lookup,
+.pt-internal-shell,
+.pt-layout,
+.pt-modality-grid,
+.pt-nurse-assignment-table,
+.pt-nurse-table,
+.pt-period-filter,
+.pt-record-toolbar,
+.pt-registration-grid,
+.pt-report-actions-grid,
+.pt-report-actions-simple,
+.pt-report-filters,
+.pt-report-grid,
+.pt-report-kpis,
+.pt-select-add,
+.pt-session-fields,
+.pt-session-layout,
+.pt-session-summary,
+.pt-stats-breakdown,
+.pt-stats-content,
+.pt-stats-daily-list,
+.pt-stats-hero,
+.pt-therapist-editor-grid,
+.pt-therapist-grid,
+.pt-therapist-list,
+.pt-therapist-main,
+.pt-urgent-toggle,
+.pt-waitlist-grid,
+.pt-waitlist-toolbar,
+.queue-badge,
+.queue-card-actions,
+.queue-flex-card,
+.range-row,
+.receipt-settings-grid,
+.registration-desk-grid,
+.registration-registry-result,
+.registration-search-results,
+.rehab-case-picker,
+.rehab-date-toolbar,
+.rehab-day-followups,
+.rehab-editor-grid,
+.rehab-export-layout,
+.rehab-field-checks,
+.rehab-follow-case-list,
+.rehab-followup-layout,
+.rehab-form-grid,
+.rehab-format-grid,
+.rehab-hero-mark,
+.rehab-history-list,
+.rehab-letterhead-preview,
+.rehab-needs-grid,
+.rehab-renewal-custom-filter,
+.rehab-renewal-layout,
+.rehab-report-style-box,
+.rehab-saved-meta,
+.rehab-saved-needs,
+.rehab-section-tabs,
+.rehab-style-grid,
+.rehab-team-grid,
+.renewal-color-control,
+.report-columns,
+.report-filter-grid,
+.reports,
+.reports-layout,
+.route-loading,
+.row,
+.search,
+.segmented-mini,
+.selected-needs-live-panel,
+.service-card,
+.service-catalog-grid,
+.service-type-icon,
+.settings-theme-row,
+.social-assessment-panel,
+.social-file-shell,
+.social-hero-mark,
+.social-history-list,
+.social-lookup,
+.social-lookup-panel,
+.social-personal-strip,
+.splash-logo-frame,
+.stat-arrow,
+.stat-grid,
+.stat-icon,
+.theme-choice-grid,
+.timeline-item,
+.top,
+.trash-detail-view,
+.two-col,
+.user-chip,
+.visit-ticket-success,
+.wafa-needs-final-list,
+.workflow-patient-card,
+.workflow-toolbar { min-width: 0; }
+
+.access-loading > *,
+.access-summary > *,
+.account-avatar > *,
+.account-edit-grid > *,
+.account-preview-bottom > *,
+.account-preview-custom > *,
+.account-preview-head > *,
+.activity-row > *,
+.admin-avatar > *,
+.app-splash > *,
+.archive-detail-grid > *,
+.archive-filters > *,
+.archive-layout > *,
+.archive-stats > *,
+.balance-check > *,
+.billing-grid > *,
+.bottom > *,
+.brand-logo > *,
+.check-box > *,
+.checkbox-grid > *,
+.clinic-icon > *,
+.compact > *,
+.coverage > *,
+.dashboard-module > *,
+.dashboard-module-icon > *,
+.dashboard-module-strip > *,
+.dashboard-welcome > *,
+.declaration-form-grid > *,
+.declaration-history > *,
+.declaration-patient-results > *,
+.dental-clinic-page > *,
+.dental-grid > *,
+.dental-summary > *,
+.department-permission-grid > *,
+.detail-grid > *,
+.diagnostic-catalog-manager > *,
+.diagnostic-catalog-toolbar > *,
+.diagnostic-grid > *,
+.diagnostic-overview > *,
+.diagnostic-test-row > *,
+.diagnostics-form-grid > *,
+.discharge-preview-sign > *,
+.discharge-preview-summary > *,
+.dock-toggle > *,
+.doctor-grid > *,
+.doctor-kpis > *,
+.donut > *,
+.dual-range > *,
+.elderly-check-card > *,
+.elderly-filter-grid > *,
+.elderly-form-grid > *,
+.elderly-numbered-list > *,
+.elderly-numbered-row > *,
+.elderly-page > *,
+.elderly-stat-card > *,
+.elderly-stats-grid > *,
+.elderly-status-box > *,
+.empty-icon > *,
+.engineer-summary-grid > *,
+.engineer-trash-card > *,
+.engineer-trash-page > *,
+.engineer-trash-summary > *,
+.enhanced > *,
+.finance-account-layout > *,
+.finance-add-coverage > *,
+.finance-age-stats > *,
+.finance-alert-rail > *,
+.finance-case-strip > *,
+.finance-check-grid > *,
+.finance-choice-add > *,
+.finance-choice-grid > *,
+.finance-claim-dates > *,
+.finance-claim-kpis > *,
+.finance-claim-layout > *,
+.finance-claim-patient > *,
+.finance-core-fields > *,
+.finance-custom-fields > *,
+.finance-custom-list > *,
+.finance-export-options > *,
+.finance-grid > *,
+.finance-grid-two > *,
+.finance-hero-mark > *,
+.finance-history-index > *,
+.finance-history-list > *,
+.finance-kpis > *,
+.finance-linked-patient > *,
+.finance-live-calc > *,
+.finance-lookup-copy > *,
+.finance-mini-list > *,
+.finance-one-amount-form > *,
+.finance-patient-lookup > *,
+.finance-report-filters > *,
+.finance-reports-layout > *,
+.finance-rules > *,
+.finance-section-tabs > *,
+.finance-shell > *,
+.finance-stat-grid > *,
+.financial-declaration-layout > *,
+.financial-declaration-shell > *,
+.followup-grid > *,
+.form-actions > *,
+.form-grid > *,
+.health-merge-box > *,
+.identity-lookup-row > *,
+.identity-row > *,
+.inline-input-action > *,
+.inpatient-admin-form-grid > *,
+.inpatient-admin-kpis > *,
+.inpatient-admin-request-list > *,
+.inpatient-card-table > *,
+.inpatient-case-grid > *,
+.inpatient-choice-add > *,
+.inpatient-choice-grid > *,
+.inpatient-choice-options > *,
+.inpatient-filter-grid > *,
+.inpatient-hero-orbit > *,
+.inpatient-identity-search > *,
+.inpatient-kpis > *,
+.inpatient-module-switcher > *,
+.inpatient-module-switcher-five > *,
+.inpatient-module-switcher-four > *,
+.inpatient-module-switcher-seven > *,
+.inpatient-module-switcher-six > *,
+.inpatient-module-switcher-three > *,
+.inpatient-registry-grid > *,
+.inpatient-registry-placeholder > *,
+.inpatient-request-grid > *,
+.inpatient-step-no > *,
+.inpatient-ward-toggle > *,
+.inquiries-kpis > *,
+.kanban-board > *,
+.kpi-icon > *,
+.lab-kpis > *,
+.lab-order-summary > *,
+.lab-result-row > *,
+.legacy-action-editor-grid > *,
+.legacy-action-finance-shortcuts > *,
+.legacy-filter-title > *,
+.legacy-finance-strip > *,
+.legacy-inpatient-actions > *,
+.legacy-inpatient-console > *,
+.legacy-inpatient-filter > *,
+.login-feature-grid > *,
+.login-mobile-brand > *,
+.login-v2 > *,
+.logout-mini > *,
+.mini-box > *,
+.mini-head > *,
+.mobile-menu > *,
+.modal-close > *,
+.moh-current-list > *,
+.moh-hero-mark > *,
+.moh-id-lookup > *,
+.moh-kpis > *,
+.moh-portal-shell > *,
+.moh-report-panel > *,
+.moh-wait-list > *,
+.needs-branches-grid > *,
+.needs-branches-panel > *,
+.needs-line > *,
+.needs-list > *,
+.needs-numbered-list-fixed > *,
+.needs-rtl-list > *,
+.nested-grid > *,
+.notification-count > *,
+.notification-empty > *,
+.operations-form > *,
+.operations-layout > *,
+.operations-patient-card > *,
+.operations-search-row > *,
+.panel > *,
+.password-toggle > *,
+.patient-diagnostics-grid > *,
+.patient-timeline > *,
+.payment-method-switch > *,
+.payment-toggle > *,
+.permission-row > *,
+.profile-grid > *,
+.pt-add-therapist > *,
+.pt-assign-list-table > *,
+.pt-assigned-patients > *,
+.pt-assignment-modal-tools > *,
+.pt-assignment-toolbar > *,
+.pt-case-grid > *,
+.pt-case-identifiers > *,
+.pt-check > *,
+.pt-days-picker > *,
+.pt-demographics > *,
+.pt-diagnosis-add > *,
+.pt-diagnosis-list > *,
+.pt-extra-fields-box > *,
+.pt-hero > *,
+.pt-hero-stats > *,
+.pt-id-lookup > *,
+.pt-internal-shell > *,
+.pt-layout > *,
+.pt-modality-grid > *,
+.pt-nurse-assignment-table > *,
+.pt-nurse-table > *,
+.pt-period-filter > *,
+.pt-record-toolbar > *,
+.pt-registration-grid > *,
+.pt-report-actions-grid > *,
+.pt-report-actions-simple > *,
+.pt-report-filters > *,
+.pt-report-grid > *,
+.pt-report-kpis > *,
+.pt-select-add > *,
+.pt-session-fields > *,
+.pt-session-layout > *,
+.pt-session-summary > *,
+.pt-stats-breakdown > *,
+.pt-stats-content > *,
+.pt-stats-daily-list > *,
+.pt-stats-hero > *,
+.pt-therapist-editor-grid > *,
+.pt-therapist-grid > *,
+.pt-therapist-list > *,
+.pt-therapist-main > *,
+.pt-urgent-toggle > *,
+.pt-waitlist-grid > *,
+.pt-waitlist-toolbar > *,
+.queue-badge > *,
+.queue-card-actions > *,
+.queue-flex-card > *,
+.range-row > *,
+.receipt-settings-grid > *,
+.registration-desk-grid > *,
+.registration-registry-result > *,
+.registration-search-results > *,
+.rehab-case-picker > *,
+.rehab-date-toolbar > *,
+.rehab-day-followups > *,
+.rehab-editor-grid > *,
+.rehab-export-layout > *,
+.rehab-field-checks > *,
+.rehab-follow-case-list > *,
+.rehab-followup-layout > *,
+.rehab-form-grid > *,
+.rehab-format-grid > *,
+.rehab-hero-mark > *,
+.rehab-history-list > *,
+.rehab-letterhead-preview > *,
+.rehab-needs-grid > *,
+.rehab-renewal-custom-filter > *,
+.rehab-renewal-layout > *,
+.rehab-report-style-box > *,
+.rehab-saved-meta > *,
+.rehab-saved-needs > *,
+.rehab-section-tabs > *,
+.rehab-style-grid > *,
+.rehab-team-grid > *,
+.renewal-color-control > *,
+.report-columns > *,
+.report-filter-grid > *,
+.reports > *,
+.reports-layout > *,
+.route-loading > *,
+.row > *,
+.search > *,
+.segmented-mini > *,
+.selected-needs-live-panel > *,
+.service-card > *,
+.service-catalog-grid > *,
+.service-type-icon > *,
+.settings-theme-row > *,
+.social-assessment-panel > *,
+.social-file-shell > *,
+.social-hero-mark > *,
+.social-history-list > *,
+.social-lookup > *,
+.social-lookup-panel > *,
+.social-personal-strip > *,
+.splash-logo-frame > *,
+.stat-arrow > *,
+.stat-grid > *,
+.stat-icon > *,
+.theme-choice-grid > *,
+.timeline-item > *,
+.top > *,
+.trash-detail-view > *,
+.two-col > *,
+.user-chip > *,
+.visit-ticket-success > *,
+.wafa-needs-final-list > *,
+.workflow-patient-card > *,
+.workflow-toolbar > * { min-width: 0; }
+
+/* النصوص داخل الشبكات تلتف بدل أن تفرض عرضاً أدنى */
+.access-loading > *,
+.access-summary > *,
+.account-avatar > *,
+.account-edit-grid > *,
+.account-preview-bottom > *,
+.account-preview-custom > *,
+.account-preview-head > *,
+.activity-row > *,
+.admin-avatar > *,
+.app-splash > *,
+.archive-detail-grid > *,
+.archive-filters > *,
+.archive-layout > *,
+.archive-stats > *,
+.balance-check > *,
+.billing-grid > *,
+.bottom > *,
+.brand-logo > *,
+.check-box > *,
+.checkbox-grid > *,
+.clinic-icon > *,
+.compact > *,
+.coverage > *,
+.dashboard-module > *,
+.dashboard-module-icon > *,
+.dashboard-module-strip > *,
+.dashboard-welcome > *,
+.declaration-form-grid > *,
+.declaration-history > *,
+.declaration-patient-results > *,
+.dental-clinic-page > *,
+.dental-grid > *,
+.dental-summary > *,
+.department-permission-grid > *,
+.detail-grid > *,
+.diagnostic-catalog-manager > *,
+.diagnostic-catalog-toolbar > *,
+.diagnostic-grid > *,
+.diagnostic-overview > *,
+.diagnostic-test-row > *,
+.diagnostics-form-grid > *,
+.discharge-preview-sign > *,
+.discharge-preview-summary > *,
+.dock-toggle > *,
+.doctor-grid > *,
+.doctor-kpis > *,
+.donut > *,
+.dual-range > *,
+.elderly-check-card > *,
+.elderly-filter-grid > *,
+.elderly-form-grid > *,
+.elderly-numbered-list > *,
+.elderly-numbered-row > *,
+.elderly-page > *,
+.elderly-stat-card > *,
+.elderly-stats-grid > *,
+.elderly-status-box > *,
+.empty-icon > *,
+.engineer-summary-grid > *,
+.engineer-trash-card > *,
+.engineer-trash-page > *,
+.engineer-trash-summary > *,
+.enhanced > *,
+.finance-account-layout > *,
+.finance-add-coverage > *,
+.finance-age-stats > *,
+.finance-alert-rail > *,
+.finance-case-strip > *,
+.finance-check-grid > *,
+.finance-choice-add > *,
+.finance-choice-grid > *,
+.finance-claim-dates > *,
+.finance-claim-kpis > *,
+.finance-claim-layout > *,
+.finance-claim-patient > *,
+.finance-core-fields > *,
+.finance-custom-fields > *,
+.finance-custom-list > *,
+.finance-export-options > *,
+.finance-grid > *,
+.finance-grid-two > *,
+.finance-hero-mark > *,
+.finance-history-index > *,
+.finance-history-list > *,
+.finance-kpis > *,
+.finance-linked-patient > *,
+.finance-live-calc > *,
+.finance-lookup-copy > *,
+.finance-mini-list > *,
+.finance-one-amount-form > *,
+.finance-patient-lookup > *,
+.finance-report-filters > *,
+.finance-reports-layout > *,
+.finance-rules > *,
+.finance-section-tabs > *,
+.finance-shell > *,
+.finance-stat-grid > *,
+.financial-declaration-layout > *,
+.financial-declaration-shell > *,
+.followup-grid > *,
+.form-actions > *,
+.form-grid > *,
+.health-merge-box > *,
+.identity-lookup-row > *,
+.identity-row > *,
+.inline-input-action > *,
+.inpatient-admin-form-grid > *,
+.inpatient-admin-kpis > *,
+.inpatient-admin-request-list > *,
+.inpatient-card-table > *,
+.inpatient-case-grid > *,
+.inpatient-choice-add > *,
+.inpatient-choice-grid > *,
+.inpatient-choice-options > *,
+.inpatient-filter-grid > *,
+.inpatient-hero-orbit > *,
+.inpatient-identity-search > *,
+.inpatient-kpis > *,
+.inpatient-module-switcher > *,
+.inpatient-module-switcher-five > *,
+.inpatient-module-switcher-four > *,
+.inpatient-module-switcher-seven > *,
+.inpatient-module-switcher-six > *,
+.inpatient-module-switcher-three > *,
+.inpatient-registry-grid > *,
+.inpatient-registry-placeholder > *,
+.inpatient-request-grid > *,
+.inpatient-step-no > *,
+.inpatient-ward-toggle > *,
+.inquiries-kpis > *,
+.kanban-board > *,
+.kpi-icon > *,
+.lab-kpis > *,
+.lab-order-summary > *,
+.lab-result-row > *,
+.legacy-action-editor-grid > *,
+.legacy-action-finance-shortcuts > *,
+.legacy-filter-title > *,
+.legacy-finance-strip > *,
+.legacy-inpatient-actions > *,
+.legacy-inpatient-console > *,
+.legacy-inpatient-filter > *,
+.login-feature-grid > *,
+.login-mobile-brand > *,
+.login-v2 > *,
+.logout-mini > *,
+.mini-box > *,
+.mini-head > *,
+.mobile-menu > *,
+.modal-close > *,
+.moh-current-list > *,
+.moh-hero-mark > *,
+.moh-id-lookup > *,
+.moh-kpis > *,
+.moh-portal-shell > *,
+.moh-report-panel > *,
+.moh-wait-list > *,
+.needs-branches-grid > *,
+.needs-branches-panel > *,
+.needs-line > *,
+.needs-list > *,
+.needs-numbered-list-fixed > *,
+.needs-rtl-list > *,
+.nested-grid > *,
+.notification-count > *,
+.notification-empty > *,
+.operations-form > *,
+.operations-layout > *,
+.operations-patient-card > *,
+.operations-search-row > *,
+.panel > *,
+.password-toggle > *,
+.patient-diagnostics-grid > *,
+.patient-timeline > *,
+.payment-method-switch > *,
+.payment-toggle > *,
+.permission-row > *,
+.profile-grid > *,
+.pt-add-therapist > *,
+.pt-assign-list-table > *,
+.pt-assigned-patients > *,
+.pt-assignment-modal-tools > *,
+.pt-assignment-toolbar > *,
+.pt-case-grid > *,
+.pt-case-identifiers > *,
+.pt-check > *,
+.pt-days-picker > *,
+.pt-demographics > *,
+.pt-diagnosis-add > *,
+.pt-diagnosis-list > *,
+.pt-extra-fields-box > *,
+.pt-hero > *,
+.pt-hero-stats > *,
+.pt-id-lookup > *,
+.pt-internal-shell > *,
+.pt-layout > *,
+.pt-modality-grid > *,
+.pt-nurse-assignment-table > *,
+.pt-nurse-table > *,
+.pt-period-filter > *,
+.pt-record-toolbar > *,
+.pt-registration-grid > *,
+.pt-report-actions-grid > *,
+.pt-report-actions-simple > *,
+.pt-report-filters > *,
+.pt-report-grid > *,
+.pt-report-kpis > *,
+.pt-select-add > *,
+.pt-session-fields > *,
+.pt-session-layout > *,
+.pt-session-summary > *,
+.pt-stats-breakdown > *,
+.pt-stats-content > *,
+.pt-stats-daily-list > *,
+.pt-stats-hero > *,
+.pt-therapist-editor-grid > *,
+.pt-therapist-grid > *,
+.pt-therapist-list > *,
+.pt-therapist-main > *,
+.pt-urgent-toggle > *,
+.pt-waitlist-grid > *,
+.pt-waitlist-toolbar > *,
+.queue-badge > *,
+.queue-card-actions > *,
+.queue-flex-card > *,
+.range-row > *,
+.receipt-settings-grid > *,
+.registration-desk-grid > *,
+.registration-registry-result > *,
+.registration-search-results > *,
+.rehab-case-picker > *,
+.rehab-date-toolbar > *,
+.rehab-day-followups > *,
+.rehab-editor-grid > *,
+.rehab-export-layout > *,
+.rehab-field-checks > *,
+.rehab-follow-case-list > *,
+.rehab-followup-layout > *,
+.rehab-form-grid > *,
+.rehab-format-grid > *,
+.rehab-hero-mark > *,
+.rehab-history-list > *,
+.rehab-letterhead-preview > *,
+.rehab-needs-grid > *,
+.rehab-renewal-custom-filter > *,
+.rehab-renewal-layout > *,
+.rehab-report-style-box > *,
+.rehab-saved-meta > *,
+.rehab-saved-needs > *,
+.rehab-section-tabs > *,
+.rehab-style-grid > *,
+.rehab-team-grid > *,
+.renewal-color-control > *,
+.report-columns > *,
+.report-filter-grid > *,
+.reports > *,
+.reports-layout > *,
+.route-loading > *,
+.row > *,
+.search > *,
+.segmented-mini > *,
+.selected-needs-live-panel > *,
+.service-card > *,
+.service-catalog-grid > *,
+.service-type-icon > *,
+.settings-theme-row > *,
+.social-assessment-panel > *,
+.social-file-shell > *,
+.social-hero-mark > *,
+.social-history-list > *,
+.social-lookup > *,
+.social-lookup-panel > *,
+.social-personal-strip > *,
+.splash-logo-frame > *,
+.stat-arrow > *,
+.stat-grid > *,
+.stat-icon > *,
+.theme-choice-grid > *,
+.timeline-item > *,
+.top > *,
+.trash-detail-view > *,
+.two-col > *,
+.user-chip > *,
+.visit-ticket-success > *,
+.wafa-needs-final-list > *,
+.workflow-patient-card > *,
+.workflow-toolbar > * b,
+.access-loading > *,
+.access-summary > *,
+.account-avatar > *,
+.account-edit-grid > *,
+.account-preview-bottom > *,
+.account-preview-custom > *,
+.account-preview-head > *,
+.activity-row > *,
+.admin-avatar > *,
+.app-splash > *,
+.archive-detail-grid > *,
+.archive-filters > *,
+.archive-layout > *,
+.archive-stats > *,
+.balance-check > *,
+.billing-grid > *,
+.bottom > *,
+.brand-logo > *,
+.check-box > *,
+.checkbox-grid > *,
+.clinic-icon > *,
+.compact > *,
+.coverage > *,
+.dashboard-module > *,
+.dashboard-module-icon > *,
+.dashboard-module-strip > *,
+.dashboard-welcome > *,
+.declaration-form-grid > *,
+.declaration-history > *,
+.declaration-patient-results > *,
+.dental-clinic-page > *,
+.dental-grid > *,
+.dental-summary > *,
+.department-permission-grid > *,
+.detail-grid > *,
+.diagnostic-catalog-manager > *,
+.diagnostic-catalog-toolbar > *,
+.diagnostic-grid > *,
+.diagnostic-overview > *,
+.diagnostic-test-row > *,
+.diagnostics-form-grid > *,
+.discharge-preview-sign > *,
+.discharge-preview-summary > *,
+.dock-toggle > *,
+.doctor-grid > *,
+.doctor-kpis > *,
+.donut > *,
+.dual-range > *,
+.elderly-check-card > *,
+.elderly-filter-grid > *,
+.elderly-form-grid > *,
+.elderly-numbered-list > *,
+.elderly-numbered-row > *,
+.elderly-page > *,
+.elderly-stat-card > *,
+.elderly-stats-grid > *,
+.elderly-status-box > *,
+.empty-icon > *,
+.engineer-summary-grid > *,
+.engineer-trash-card > *,
+.engineer-trash-page > *,
+.engineer-trash-summary > *,
+.enhanced > *,
+.finance-account-layout > *,
+.finance-add-coverage > *,
+.finance-age-stats > *,
+.finance-alert-rail > *,
+.finance-case-strip > *,
+.finance-check-grid > *,
+.finance-choice-add > *,
+.finance-choice-grid > *,
+.finance-claim-dates > *,
+.finance-claim-kpis > *,
+.finance-claim-layout > *,
+.finance-claim-patient > *,
+.finance-core-fields > *,
+.finance-custom-fields > *,
+.finance-custom-list > *,
+.finance-export-options > *,
+.finance-grid > *,
+.finance-grid-two > *,
+.finance-hero-mark > *,
+.finance-history-index > *,
+.finance-history-list > *,
+.finance-kpis > *,
+.finance-linked-patient > *,
+.finance-live-calc > *,
+.finance-lookup-copy > *,
+.finance-mini-list > *,
+.finance-one-amount-form > *,
+.finance-patient-lookup > *,
+.finance-report-filters > *,
+.finance-reports-layout > *,
+.finance-rules > *,
+.finance-section-tabs > *,
+.finance-shell > *,
+.finance-stat-grid > *,
+.financial-declaration-layout > *,
+.financial-declaration-shell > *,
+.followup-grid > *,
+.form-actions > *,
+.form-grid > *,
+.health-merge-box > *,
+.identity-lookup-row > *,
+.identity-row > *,
+.inline-input-action > *,
+.inpatient-admin-form-grid > *,
+.inpatient-admin-kpis > *,
+.inpatient-admin-request-list > *,
+.inpatient-card-table > *,
+.inpatient-case-grid > *,
+.inpatient-choice-add > *,
+.inpatient-choice-grid > *,
+.inpatient-choice-options > *,
+.inpatient-filter-grid > *,
+.inpatient-hero-orbit > *,
+.inpatient-identity-search > *,
+.inpatient-kpis > *,
+.inpatient-module-switcher > *,
+.inpatient-module-switcher-five > *,
+.inpatient-module-switcher-four > *,
+.inpatient-module-switcher-seven > *,
+.inpatient-module-switcher-six > *,
+.inpatient-module-switcher-three > *,
+.inpatient-registry-grid > *,
+.inpatient-registry-placeholder > *,
+.inpatient-request-grid > *,
+.inpatient-step-no > *,
+.inpatient-ward-toggle > *,
+.inquiries-kpis > *,
+.kanban-board > *,
+.kpi-icon > *,
+.lab-kpis > *,
+.lab-order-summary > *,
+.lab-result-row > *,
+.legacy-action-editor-grid > *,
+.legacy-action-finance-shortcuts > *,
+.legacy-filter-title > *,
+.legacy-finance-strip > *,
+.legacy-inpatient-actions > *,
+.legacy-inpatient-console > *,
+.legacy-inpatient-filter > *,
+.login-feature-grid > *,
+.login-mobile-brand > *,
+.login-v2 > *,
+.logout-mini > *,
+.mini-box > *,
+.mini-head > *,
+.mobile-menu > *,
+.modal-close > *,
+.moh-current-list > *,
+.moh-hero-mark > *,
+.moh-id-lookup > *,
+.moh-kpis > *,
+.moh-portal-shell > *,
+.moh-report-panel > *,
+.moh-wait-list > *,
+.needs-branches-grid > *,
+.needs-branches-panel > *,
+.needs-line > *,
+.needs-list > *,
+.needs-numbered-list-fixed > *,
+.needs-rtl-list > *,
+.nested-grid > *,
+.notification-count > *,
+.notification-empty > *,
+.operations-form > *,
+.operations-layout > *,
+.operations-patient-card > *,
+.operations-search-row > *,
+.panel > *,
+.password-toggle > *,
+.patient-diagnostics-grid > *,
+.patient-timeline > *,
+.payment-method-switch > *,
+.payment-toggle > *,
+.permission-row > *,
+.profile-grid > *,
+.pt-add-therapist > *,
+.pt-assign-list-table > *,
+.pt-assigned-patients > *,
+.pt-assignment-modal-tools > *,
+.pt-assignment-toolbar > *,
+.pt-case-grid > *,
+.pt-case-identifiers > *,
+.pt-check > *,
+.pt-days-picker > *,
+.pt-demographics > *,
+.pt-diagnosis-add > *,
+.pt-diagnosis-list > *,
+.pt-extra-fields-box > *,
+.pt-hero > *,
+.pt-hero-stats > *,
+.pt-id-lookup > *,
+.pt-internal-shell > *,
+.pt-layout > *,
+.pt-modality-grid > *,
+.pt-nurse-assignment-table > *,
+.pt-nurse-table > *,
+.pt-period-filter > *,
+.pt-record-toolbar > *,
+.pt-registration-grid > *,
+.pt-report-actions-grid > *,
+.pt-report-actions-simple > *,
+.pt-report-filters > *,
+.pt-report-grid > *,
+.pt-report-kpis > *,
+.pt-select-add > *,
+.pt-session-fields > *,
+.pt-session-layout > *,
+.pt-session-summary > *,
+.pt-stats-breakdown > *,
+.pt-stats-content > *,
+.pt-stats-daily-list > *,
+.pt-stats-hero > *,
+.pt-therapist-editor-grid > *,
+.pt-therapist-grid > *,
+.pt-therapist-list > *,
+.pt-therapist-main > *,
+.pt-urgent-toggle > *,
+.pt-waitlist-grid > *,
+.pt-waitlist-toolbar > *,
+.queue-badge > *,
+.queue-card-actions > *,
+.queue-flex-card > *,
+.range-row > *,
+.receipt-settings-grid > *,
+.registration-desk-grid > *,
+.registration-registry-result > *,
+.registration-search-results > *,
+.rehab-case-picker > *,
+.rehab-date-toolbar > *,
+.rehab-day-followups > *,
+.rehab-editor-grid > *,
+.rehab-export-layout > *,
+.rehab-field-checks > *,
+.rehab-follow-case-list > *,
+.rehab-followup-layout > *,
+.rehab-form-grid > *,
+.rehab-format-grid > *,
+.rehab-hero-mark > *,
+.rehab-history-list > *,
+.rehab-letterhead-preview > *,
+.rehab-needs-grid > *,
+.rehab-renewal-custom-filter > *,
+.rehab-renewal-layout > *,
+.rehab-report-style-box > *,
+.rehab-saved-meta > *,
+.rehab-saved-needs > *,
+.rehab-section-tabs > *,
+.rehab-style-grid > *,
+.rehab-team-grid > *,
+.renewal-color-control > *,
+.report-columns > *,
+.report-filter-grid > *,
+.reports > *,
+.reports-layout > *,
+.route-loading > *,
+.row > *,
+.search > *,
+.segmented-mini > *,
+.selected-needs-live-panel > *,
+.service-card > *,
+.service-catalog-grid > *,
+.service-type-icon > *,
+.settings-theme-row > *,
+.social-assessment-panel > *,
+.social-file-shell > *,
+.social-hero-mark > *,
+.social-history-list > *,
+.social-lookup > *,
+.social-lookup-panel > *,
+.social-personal-strip > *,
+.splash-logo-frame > *,
+.stat-arrow > *,
+.stat-grid > *,
+.stat-icon > *,
+.theme-choice-grid > *,
+.timeline-item > *,
+.top > *,
+.trash-detail-view > *,
+.two-col > *,
+.user-chip > *,
+.visit-ticket-success > *,
+.wafa-needs-final-list > *,
+.workflow-patient-card > *,
+.workflow-toolbar > * small,
+.access-loading > *,
+.access-summary > *,
+.account-avatar > *,
+.account-edit-grid > *,
+.account-preview-bottom > *,
+.account-preview-custom > *,
+.account-preview-head > *,
+.activity-row > *,
+.admin-avatar > *,
+.app-splash > *,
+.archive-detail-grid > *,
+.archive-filters > *,
+.archive-layout > *,
+.archive-stats > *,
+.balance-check > *,
+.billing-grid > *,
+.bottom > *,
+.brand-logo > *,
+.check-box > *,
+.checkbox-grid > *,
+.clinic-icon > *,
+.compact > *,
+.coverage > *,
+.dashboard-module > *,
+.dashboard-module-icon > *,
+.dashboard-module-strip > *,
+.dashboard-welcome > *,
+.declaration-form-grid > *,
+.declaration-history > *,
+.declaration-patient-results > *,
+.dental-clinic-page > *,
+.dental-grid > *,
+.dental-summary > *,
+.department-permission-grid > *,
+.detail-grid > *,
+.diagnostic-catalog-manager > *,
+.diagnostic-catalog-toolbar > *,
+.diagnostic-grid > *,
+.diagnostic-overview > *,
+.diagnostic-test-row > *,
+.diagnostics-form-grid > *,
+.discharge-preview-sign > *,
+.discharge-preview-summary > *,
+.dock-toggle > *,
+.doctor-grid > *,
+.doctor-kpis > *,
+.donut > *,
+.dual-range > *,
+.elderly-check-card > *,
+.elderly-filter-grid > *,
+.elderly-form-grid > *,
+.elderly-numbered-list > *,
+.elderly-numbered-row > *,
+.elderly-page > *,
+.elderly-stat-card > *,
+.elderly-stats-grid > *,
+.elderly-status-box > *,
+.empty-icon > *,
+.engineer-summary-grid > *,
+.engineer-trash-card > *,
+.engineer-trash-page > *,
+.engineer-trash-summary > *,
+.enhanced > *,
+.finance-account-layout > *,
+.finance-add-coverage > *,
+.finance-age-stats > *,
+.finance-alert-rail > *,
+.finance-case-strip > *,
+.finance-check-grid > *,
+.finance-choice-add > *,
+.finance-choice-grid > *,
+.finance-claim-dates > *,
+.finance-claim-kpis > *,
+.finance-claim-layout > *,
+.finance-claim-patient > *,
+.finance-core-fields > *,
+.finance-custom-fields > *,
+.finance-custom-list > *,
+.finance-export-options > *,
+.finance-grid > *,
+.finance-grid-two > *,
+.finance-hero-mark > *,
+.finance-history-index > *,
+.finance-history-list > *,
+.finance-kpis > *,
+.finance-linked-patient > *,
+.finance-live-calc > *,
+.finance-lookup-copy > *,
+.finance-mini-list > *,
+.finance-one-amount-form > *,
+.finance-patient-lookup > *,
+.finance-report-filters > *,
+.finance-reports-layout > *,
+.finance-rules > *,
+.finance-section-tabs > *,
+.finance-shell > *,
+.finance-stat-grid > *,
+.financial-declaration-layout > *,
+.financial-declaration-shell > *,
+.followup-grid > *,
+.form-actions > *,
+.form-grid > *,
+.health-merge-box > *,
+.identity-lookup-row > *,
+.identity-row > *,
+.inline-input-action > *,
+.inpatient-admin-form-grid > *,
+.inpatient-admin-kpis > *,
+.inpatient-admin-request-list > *,
+.inpatient-card-table > *,
+.inpatient-case-grid > *,
+.inpatient-choice-add > *,
+.inpatient-choice-grid > *,
+.inpatient-choice-options > *,
+.inpatient-filter-grid > *,
+.inpatient-hero-orbit > *,
+.inpatient-identity-search > *,
+.inpatient-kpis > *,
+.inpatient-module-switcher > *,
+.inpatient-module-switcher-five > *,
+.inpatient-module-switcher-four > *,
+.inpatient-module-switcher-seven > *,
+.inpatient-module-switcher-six > *,
+.inpatient-module-switcher-three > *,
+.inpatient-registry-grid > *,
+.inpatient-registry-placeholder > *,
+.inpatient-request-grid > *,
+.inpatient-step-no > *,
+.inpatient-ward-toggle > *,
+.inquiries-kpis > *,
+.kanban-board > *,
+.kpi-icon > *,
+.lab-kpis > *,
+.lab-order-summary > *,
+.lab-result-row > *,
+.legacy-action-editor-grid > *,
+.legacy-action-finance-shortcuts > *,
+.legacy-filter-title > *,
+.legacy-finance-strip > *,
+.legacy-inpatient-actions > *,
+.legacy-inpatient-console > *,
+.legacy-inpatient-filter > *,
+.login-feature-grid > *,
+.login-mobile-brand > *,
+.login-v2 > *,
+.logout-mini > *,
+.mini-box > *,
+.mini-head > *,
+.mobile-menu > *,
+.modal-close > *,
+.moh-current-list > *,
+.moh-hero-mark > *,
+.moh-id-lookup > *,
+.moh-kpis > *,
+.moh-portal-shell > *,
+.moh-report-panel > *,
+.moh-wait-list > *,
+.needs-branches-grid > *,
+.needs-branches-panel > *,
+.needs-line > *,
+.needs-list > *,
+.needs-numbered-list-fixed > *,
+.needs-rtl-list > *,
+.nested-grid > *,
+.notification-count > *,
+.notification-empty > *,
+.operations-form > *,
+.operations-layout > *,
+.operations-patient-card > *,
+.operations-search-row > *,
+.panel > *,
+.password-toggle > *,
+.patient-diagnostics-grid > *,
+.patient-timeline > *,
+.payment-method-switch > *,
+.payment-toggle > *,
+.permission-row > *,
+.profile-grid > *,
+.pt-add-therapist > *,
+.pt-assign-list-table > *,
+.pt-assigned-patients > *,
+.pt-assignment-modal-tools > *,
+.pt-assignment-toolbar > *,
+.pt-case-grid > *,
+.pt-case-identifiers > *,
+.pt-check > *,
+.pt-days-picker > *,
+.pt-demographics > *,
+.pt-diagnosis-add > *,
+.pt-diagnosis-list > *,
+.pt-extra-fields-box > *,
+.pt-hero > *,
+.pt-hero-stats > *,
+.pt-id-lookup > *,
+.pt-internal-shell > *,
+.pt-layout > *,
+.pt-modality-grid > *,
+.pt-nurse-assignment-table > *,
+.pt-nurse-table > *,
+.pt-period-filter > *,
+.pt-record-toolbar > *,
+.pt-registration-grid > *,
+.pt-report-actions-grid > *,
+.pt-report-actions-simple > *,
+.pt-report-filters > *,
+.pt-report-grid > *,
+.pt-report-kpis > *,
+.pt-select-add > *,
+.pt-session-fields > *,
+.pt-session-layout > *,
+.pt-session-summary > *,
+.pt-stats-breakdown > *,
+.pt-stats-content > *,
+.pt-stats-daily-list > *,
+.pt-stats-hero > *,
+.pt-therapist-editor-grid > *,
+.pt-therapist-grid > *,
+.pt-therapist-list > *,
+.pt-therapist-main > *,
+.pt-urgent-toggle > *,
+.pt-waitlist-grid > *,
+.pt-waitlist-toolbar > *,
+.queue-badge > *,
+.queue-card-actions > *,
+.queue-flex-card > *,
+.range-row > *,
+.receipt-settings-grid > *,
+.registration-desk-grid > *,
+.registration-registry-result > *,
+.registration-search-results > *,
+.rehab-case-picker > *,
+.rehab-date-toolbar > *,
+.rehab-day-followups > *,
+.rehab-editor-grid > *,
+.rehab-export-layout > *,
+.rehab-field-checks > *,
+.rehab-follow-case-list > *,
+.rehab-followup-layout > *,
+.rehab-form-grid > *,
+.rehab-format-grid > *,
+.rehab-hero-mark > *,
+.rehab-history-list > *,
+.rehab-letterhead-preview > *,
+.rehab-needs-grid > *,
+.rehab-renewal-custom-filter > *,
+.rehab-renewal-layout > *,
+.rehab-report-style-box > *,
+.rehab-saved-meta > *,
+.rehab-saved-needs > *,
+.rehab-section-tabs > *,
+.rehab-style-grid > *,
+.rehab-team-grid > *,
+.renewal-color-control > *,
+.report-columns > *,
+.report-filter-grid > *,
+.reports > *,
+.reports-layout > *,
+.route-loading > *,
+.row > *,
+.search > *,
+.segmented-mini > *,
+.selected-needs-live-panel > *,
+.service-card > *,
+.service-catalog-grid > *,
+.service-type-icon > *,
+.settings-theme-row > *,
+.social-assessment-panel > *,
+.social-file-shell > *,
+.social-hero-mark > *,
+.social-history-list > *,
+.social-lookup > *,
+.social-lookup-panel > *,
+.social-personal-strip > *,
+.splash-logo-frame > *,
+.stat-arrow > *,
+.stat-grid > *,
+.stat-icon > *,
+.theme-choice-grid > *,
+.timeline-item > *,
+.top > *,
+.trash-detail-view > *,
+.two-col > *,
+.user-chip > *,
+.visit-ticket-success > *,
+.wafa-needs-final-list > *,
+.workflow-patient-card > *,
+.workflow-toolbar > * span { min-width: 0; overflow-wrap: break-word; }
+
+/* =========================================================================
+   v4.3.96 — شمول الحركة لكل حاويات المحتوى
+   الفحص أظهر 18 حاوية شائعة الاستخدام لا تصلها حركة الدخول، فكانت بعض
+   الشاشات تظهر ساكنة بينما غيرها متحرك. هذه القائمة تُوحّد السلوك.
+   ========================================================================= */
+
+.finance-report-section, .social-form-section, .report-section,
+.rehab-editor-panel, .registration-card, .engineer-filter-panel,
+.moh-registry-card, .pt-registration-card, .pt-case-card,
+.pt-cases-table-panel, .legacy-inpatient-filter-panel,
+.legacy-action-editor-panel, .legacy-inpatient-head,
+.legacy-inpatient-table-panel, .elderly-chip-grid, .panel-title {
+  animation: wx-panel-in .46s var(--wx-spring) both;
+}
+.finance-report-section:nth-of-type(2), .social-form-section:nth-of-type(2), .report-section:nth-of-type(2) { animation-delay: .06s; }
+.finance-report-section:nth-of-type(3), .social-form-section:nth-of-type(3), .report-section:nth-of-type(3) { animation-delay: .12s; }
+.finance-report-section:nth-of-type(n+4), .social-form-section:nth-of-type(n+4), .report-section:nth-of-type(n+4) { animation-delay: .18s; }
+
+/* استجابة للمؤشر على الحاويات القابلة للتفاعل */
+.registration-card, .pt-case-card, .moh-registry-card, .rehab-editor-panel {
+  transition: border-color var(--wx-base) var(--wx-swift), box-shadow var(--wx-base) var(--wx-swift);
+}
+.registration-card:hover, .pt-case-card:hover, .moh-registry-card:hover { border-color: var(--border-strong); }
+
+/* رؤوس الأقسام الفرعية: خط لوني رفيع يوحّد شكلها مع رؤوس الصفحات */
+.finance-report-section-head, .panel-title {
+  position: relative;
+  padding-inline-start: 12px;
+}
+.finance-report-section-head::before, .panel-title::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 3px;
+  width: 3px;
+  border-radius: 99px;
+  background: var(--wx-rail);
+  opacity: .85;
+}
+
+/* شارة التنبيه: اتجاه منطقي بدل ثابت حتى تبقى في مكانها بالعربية والإنجليزية */
+.notification i { right: auto !important; inset-inline-end: 7px !important; }
+.notification-count { right: auto !important; inset-inline-end: 2px !important; }
+
+@media print {
+  .finance-report-section, .social-form-section, .report-section,
+  .rehab-editor-panel, .registration-card, .panel-title {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

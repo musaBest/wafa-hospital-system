@@ -1,0 +1,5 @@
+WAFAA HIS v4.5.3
+- Fixed TypeScript build failure in cashierWorkflowExport.ts.
+- Receipt PDF export now awaits and uses the silent export host correctly.
+- Removed invalid Promise/iframe contentDocument access.
+- Preserved the silent/off-screen export behavior and existing UI fixes from v4.5.2.

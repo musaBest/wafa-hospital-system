@@ -1,0 +1,6 @@
+v4.3.65 FINAL EXPORT FIX
+- Real DOCX export that preserves the rendered report/template layout.
+- Removed UI-hiding export mode responsible for white-screen flashes.
+- Off-screen capture hosts stay renderable and keep fixed dimensions during PDF/Word generation.
+- Export dialogs close only after a successful file generation.
+- Safer browser download handling for DOCX/XLSX object URLs.

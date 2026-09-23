@@ -1,8 +1,3 @@
 <?php
-
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Artisan::command('wafaa:status', function () { $this->info('Wafaa Hospital API is ready.'); })->purpose('Check Wafaa HIS installation');

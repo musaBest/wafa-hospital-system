@@ -3,93 +3,64 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Notification;
-use Illuminate\Http\JsonResponse;
+use App\Models\SystemNotification;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    /**
-     * Get recent notifications.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $role = $request->input('role', 'all_staff');
-        $userId = $request->user() ? $request->user()->id : null;
-
-        $notifications = Notification::query()
-            ->forUserOrRole($userId, $role)
-            ->latest()
-            ->limit(30)
-            ->get();
-
-        $unreadCount = Notification::query()
-            ->forUserOrRole($userId, $role)
-            ->unread()
-            ->count();
-
-        return response()->json([
-            'success' => true,
-            'data' => $notifications,
-            'unread_count' => $unreadCount,
-        ]);
+        $keys=$request->user()->effectivePermissionKeys();
+        $items=SystemNotification::query()
+            ->when(!$request->user()->isPrimaryCashier(), function($query) use ($request, $keys) {
+                $query->where(function($q)use($request,$keys){
+                    $q->where('user_id',$request->user()->id)
+                      ->orWhere(function($x)use($keys){$x->whereNull('user_id')->whereNotNull('permission_key')->whereIn('permission_key',$keys);});
+                });
+            })
+            ->latest()->limit(100)->get()
+            ->reject(fn($x) => is_array($x->muted_by) && in_array($request->user()->id, $x->muted_by, true))
+            ->values();
+        return response()->json(['data'=>$items->map(fn($x)=>[
+            'id'=>$x->id,'type'=>$x->type,'title'=>$x->title,'body'=>$x->body,'patientId'=>$x->patient_id,'link'=>$x->link,
+            'read'=>!is_null($x->read_at),'permissionKey'=>$x->permission_key,'module'=>$x->module,'createdAt'=>$x->created_at?->toISOString(),
+        ])]);
     }
 
-    /**
-     * Mark a single notification as read.
-     */
-    public function markAsRead(Notification $notification): JsonResponse
+    public function read(Request $request, SystemNotification $systemNotification)
     {
-        $notification->update([
-            'is_read' => true,
-            'read_at' => now(),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تعيين الإشعار كمقروء',
-            'data' => $notification,
-        ]);
+        $keys=$request->user()->effectivePermissionKeys();
+        abort_unless($systemNotification->user_id===$request->user()->id || (is_null($systemNotification->user_id) && ($request->user()->isPrimaryCashier() || ($systemNotification->permission_key && in_array($systemNotification->permission_key,$keys,true)))),403);
+        $systemNotification->update(['read_at'=>now()]);
+        return response()->json(['data'=>['id'=>$systemNotification->id,'read'=>true]]);
     }
 
-    /**
-     * Mark all notifications as read.
-     */
-    public function markAllAsRead(Request $request): JsonResponse
+    public function readAll(Request $request)
     {
-        $role = $request->input('role', 'all_staff');
-        $userId = $request->user() ? $request->user()->id : null;
-
-        Notification::query()
-            ->forUserOrRole($userId, $role)
-            ->unread()
-            ->update([
-                'is_read' => true,
-                'read_at' => now(),
-            ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تعيين جميع الإشعارات كمقروءة',
-        ]);
+        $keys=$request->user()->effectivePermissionKeys();
+        SystemNotification::query()->whereNull('read_at')->where(function($q)use($request,$keys){
+            $q->where('user_id',$request->user()->id)->orWhere(function($x)use($keys){$x->whereNull('user_id')->whereNotNull('permission_key')->whereIn('permission_key',$keys);});
+        })->update(['read_at'=>now()]);
+        return response()->json(['message'=>'Notifications marked as read.']);
     }
 
-    /**
-     * Get unread notifications count.
-     */
-    public function unreadCount(Request $request): JsonResponse
+    public function clear(Request $request)
     {
-        $role = $request->input('role', 'all_staff');
-        $userId = $request->user() ? $request->user()->id : null;
+        $keys=$request->user()->effectivePermissionKeys();
+        SystemNotification::query()->where(function($q)use($request,$keys){
+            $q->where('user_id',$request->user()->id)->orWhere(function($x)use($keys){$x->whereNull('user_id')->whereNotNull('permission_key')->whereIn('permission_key',$keys);});
+        })->update(['read_at'=>now()]);
+        return response()->json(['message'=>'Notifications cleared.']);
+    }
 
-        $count = Notification::query()
-            ->forUserOrRole($userId, $role)
-            ->unread()
-            ->count();
-
-        return response()->json([
-            'success' => true,
-            'unread_count' => $count,
-        ]);
+    public function mute(Request $request, SystemNotification $systemNotification)
+    {
+        $keys=$request->user()->effectivePermissionKeys();
+        abort_unless($request->user()->isPrimaryCashier() || $systemNotification->user_id===$request->user()->id || (is_null($systemNotification->user_id) && $systemNotification->permission_key && in_array($systemNotification->permission_key,$keys,true)),403);
+        $muted = $systemNotification->muted_by ?: [];
+        if (!is_array($muted)) $muted = [];
+        if (!in_array($request->user()->id, $muted, true)) $muted[] = $request->user()->id;
+        $systemNotification->update(['muted_by'=>$muted,'read_at'=>now()]);
+        return response()->json(['data'=>['id'=>$systemNotification->id,'muted'=>true]]);
     }
 }

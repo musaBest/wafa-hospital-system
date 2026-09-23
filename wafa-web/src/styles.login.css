@@ -1,0 +1,362 @@
+/* =========================================================================
+   WAFAA HIS — شاشة تسجيل الدخول v4.3.94
+   تكوين مركزي متماثل يُقرأ كغلاف وثيقة رسمية: شعار، ثم اسم المستشفى كعنوان
+   رئيسي، ثم خط فاصل يمر عليه نبض حي، ثم نموذج الدخول.
+   الفاصل النابض هو نفس مفردة شاشة الإقلاع، فترتبط الشاشتان بهوية واحدة.
+   ========================================================================= */
+
+.lxc {
+  --c-canvas: #070d18;
+  --c-sheet: rgba(255, 255, 255, .028);
+  --c-hair: rgba(255, 255, 255, .09);
+  --c-ink: #eef4fb;
+  --c-soft: #9bb0c7;
+  --c-accent: #22d3ee;
+  --c-accent-2: #34d399;
+  --c-input: rgba(255, 255, 255, .04);
+  --e: cubic-bezier(.22, 1, .36, 1);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  align-items: center;
+  padding: clamp(28px, 5vh, 64px) 20px clamp(18px, 3vh, 28px);
+  overflow: hidden;
+  color: var(--c-ink);
+  background: var(--c-canvas) !important;
+  font-feature-settings: 'ss01';
+}
+
+html[data-theme='light'] .lxc,
+html[data-theme='pearl'] .lxc {
+  --c-canvas: #f3f7fa;
+  --c-sheet: rgba(255, 255, 255, .8);
+  --c-hair: rgba(15, 23, 42, .1);
+  --c-ink: #0d1b2a;
+  --c-soft: #55697e;
+  --c-accent: #0891b2;
+  --c-accent-2: #059669;
+  --c-input: #fff;
+}
+html[data-theme='aurora'] .lxc { --c-canvas: #0a0d20; --c-accent: #22d3ee; }
+
+/* ---- الخلفية: إضاءة واحدة هادئة وشبكة دقيقة ---- */
+.lxc-halo, .lxc-field-bg { position: absolute; inset: 0; pointer-events: none; }
+.lxc-halo {
+  background:
+    radial-gradient(52vmax 42vmax at 50% -12%, rgba(34, 211, 238, .16), transparent 60%),
+    radial-gradient(40vmax 34vmax at 50% 112%, rgba(52, 211, 153, .1), transparent 62%);
+  animation: lxc-breathe 18s ease-in-out infinite alternate;
+}
+@keyframes lxc-breathe { to { opacity: .72; transform: scale(1.06); } }
+.lxc-field-bg {
+  opacity: .5;
+  background-image:
+    linear-gradient(to right, rgba(34, 211, 238, .055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(34, 211, 238, .055) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(62% 52% at 50% 42%, #000, transparent 76%);
+  -webkit-mask-image: radial-gradient(62% 52% at 50% 42%, #000, transparent 76%);
+}
+html[data-theme='light'] .lxc-field-bg,
+html[data-theme='pearl'] .lxc-field-bg { opacity: .8; }
+
+/* ---- أزرار اللغة والوضع ---- */
+.lxc-controls { position: absolute; top: 20px; inset-inline-end: 22px; display: flex; gap: 8px; z-index: 4; }
+.lxc-controls button {
+  height: 36px;
+  min-width: 36px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+  border: 1px solid var(--c-hair);
+  background: var(--c-input);
+  color: var(--c-soft);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: color .2s var(--e), border-color .2s var(--e);
+  animation: lxc-in .5s var(--e) .55s both;
+}
+.lxc-controls button:hover { color: var(--c-accent); border-color: rgba(34, 211, 238, .4); }
+.lxc-controls svg { width: 16px; height: 16px; }
+
+/* ---- الورقة المركزية ---- */
+.lxc-sheet {
+  position: relative;
+  z-index: 2;
+  width: min(430px, 100%);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.lxc-crest {
+  width: 104px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  padding: 7px 11px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 255, 255, .5) inset;
+  animation: lxc-crest-in .75s var(--e) both;
+}
+html[data-theme='light'] .lxc-crest,
+html[data-theme='pearl'] .lxc-crest { box-shadow: 0 16px 36px rgba(30, 60, 90, .14); }
+.lxc-crest img { width: 100%; height: 100%; object-fit: contain; }
+@keyframes lxc-crest-in { from { opacity: 0; transform: translateY(-12px) scale(.9); } }
+
+.lxc-masthead { margin-top: 22px; }
+.lxc-system {
+  margin: 0 0 11px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  animation: lxc-in .55s var(--e) .1s both;
+}
+.lxc-masthead h1 {
+  margin: 0;
+  font-size: clamp(27px, 3.4vw, 34px);
+  font-weight: 800;
+  letter-spacing: -.015em;
+  line-height: 1.25;
+  color: var(--c-ink);
+  animation: lxc-in .6s var(--e) .16s both;
+}
+.lxc-full {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--c-soft);
+  animation: lxc-in .6s var(--e) .22s both;
+}
+
+/* ---- الفاصل النابض ---- */
+.lxc-rule {
+  width: 100%;
+  margin: 22px 0 26px;
+  position: relative;
+  animation: lxc-in .6s var(--e) .3s both;
+}
+.lxc-rule::before, .lxc-rule::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 32%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-hair));
+}
+.lxc-rule::before { inset-inline-start: 0; }
+.lxc-rule::after { inset-inline-end: 0; transform: scaleX(-1); }
+.lxc-rule svg { display: block; width: 44%; height: 24px; margin: 0 auto; overflow: visible; }
+.lxc-rule path { fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.lxc-trace-base { stroke: var(--c-hair); }
+.lxc-trace-live {
+  stroke: var(--c-accent);
+  stroke-dasharray: 52 480;
+  animation: lxc-trace 3s linear infinite;
+}
+@keyframes lxc-trace { from { stroke-dashoffset: 530; } to { stroke-dashoffset: 0; } }
+
+/* ---- العنوان الفرعي للنموذج ---- */
+.lxc-intro { margin-bottom: 22px; animation: lxc-in .55s var(--e) .36s both; }
+.lxc-intro h2 { margin: 0 0 6px; font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
+.lxc-intro p { margin: 0; font-size: 12px; line-height: 1.7; color: var(--c-soft); }
+
+/* ---- النموذج ---- */
+.lxc-sheet form { width: 100%; display: grid; gap: 14px; text-align: start; }
+.lxc-field { display: grid; gap: 7px; }
+.lxc-field > span {
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--c-soft);
+  transition: color .2s var(--e);
+}
+.lxc-field:focus-within > span { color: var(--c-accent); }
+.lxc-field:nth-of-type(1) { animation: lxc-in .5s var(--e) .42s both; }
+.lxc-field:nth-of-type(2) { animation: lxc-in .5s var(--e) .48s both; }
+
+.lxc-input {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--c-input);
+  border: 1px solid var(--c-hair);
+  transition: border-color .2s var(--e), box-shadow .2s var(--e), background-color .2s var(--e);
+}
+.lxc-input:focus-within { border-color: rgba(34, 211, 238, .55); box-shadow: 0 0 0 4px rgba(34, 211, 238, .1); }
+.lxc-input > svg { width: 17px; height: 17px; flex: none; color: var(--c-soft); transition: color .2s var(--e); }
+.lxc-input:focus-within > svg { color: var(--c-accent); }
+.lxc-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.lxc-input input::placeholder { color: var(--c-soft); opacity: .6; font-weight: 500; }
+.lxc-peek {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--c-soft);
+  cursor: pointer;
+  transition: color .18s var(--e), background-color .18s var(--e), transform .18s var(--e);
+}
+.lxc-peek svg { width: 16px; height: 16px; }
+.lxc-peek:hover { color: var(--c-accent); background: rgba(34, 211, 238, .1); }
+.lxc-peek:active { transform: scale(.9); }
+
+.lxc-error {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: 11px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fb7185;
+  background: rgba(251, 113, 133, .1);
+  border: 1px solid rgba(251, 113, 133, .3);
+  animation: lxc-shake .4s var(--e) both;
+}
+@keyframes lxc-shake { 0%,100% { transform: translateX(0);} 20% { transform: translateX(-6px);} 40% { transform: translateX(5px);} 60% { transform: translateX(-3px);} 80% { transform: translateX(2px);} }
+
+.lxc-submit {
+  position: relative;
+  overflow: hidden;
+  height: 52px;
+  margin-top: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #04252b;
+  background: linear-gradient(135deg, var(--c-accent), var(--c-accent-2));
+  box-shadow: 0 14px 32px rgba(34, 211, 238, .24);
+  transition: transform .2s var(--e), box-shadow .2s var(--e), filter .2s var(--e);
+  animation: lxc-in .5s var(--e) .54s both;
+}
+.lxc-submit svg { width: 17px; height: 17px; }
+.lxc-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 20px 42px rgba(34, 211, 238, .32); }
+.lxc-submit:active:not(:disabled) { transform: scale(.98); }
+.lxc-submit:disabled { cursor: progress; filter: saturate(.9); }
+.lxc-submit::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -55%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+  transform: skewX(-18deg);
+  opacity: 0;
+}
+.lxc-submit:hover:not(:disabled)::after { opacity: 1; animation: lxc-sheen .8s var(--e); }
+.lxc-submit:disabled::after { opacity: 1; animation: lxc-sheen 1.1s linear infinite; }
+@keyframes lxc-sheen { to { inset-inline-start: 115%; } }
+
+/* ---- شريط الأقسام: كلمات هادئة بفواصل، لا بطاقات ---- */
+.lxc-units {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  animation: lxc-in .55s var(--e) .62s both;
+}
+.lxc-units li {
+  position: relative;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: var(--c-soft);
+  opacity: .8;
+}
+.lxc-units li + li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: -9px;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .5;
+  transform: translateY(-50%);
+}
+
+/* ---- التذييل ---- */
+.lxc-foot {
+  width: 100%;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-hair);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: lxc-in .55s var(--e) .68s both;
+}
+.lxc-secure, .lxc-live { display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 800; color: var(--c-soft); }
+.lxc-secure svg { width: 14px; height: 14px; color: var(--c-accent-2); }
+.lxc-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-accent-2);
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, .13);
+  animation: lxc-beat 2s ease-in-out infinite;
+}
+@keyframes lxc-beat { 50% { box-shadow: 0 0 0 9px rgba(52, 211, 153, 0); } }
+.lxc-live b { color: var(--c-ink); font-size: 12px; margin-inline-start: 3px; font-variant-numeric: tabular-nums; }
+
+.lxc-copyright {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-size: 10px;
+  color: var(--c-soft);
+  opacity: .6;
+  animation: lxc-in .55s var(--e) .74s both;
+}
+
+@keyframes lxc-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (max-width: 480px) {
+  .lxc { padding: 26px 16px 18px; }
+  .lxc-masthead h1 { font-size: 24px; }
+  .lxc-rule svg { width: 56%; }
+  .lxc-foot { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lxc *, .lxc-halo, .lxc-trace-live { animation: none !important; }
+}

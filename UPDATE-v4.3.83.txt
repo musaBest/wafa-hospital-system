@@ -1,0 +1,22 @@
+WAFAA Hospital System v4.3.83
+
+Focus: sidebar UX, live language switching, and consistent color themes.
+
+Changes:
+1. Sidebar collapsed mode redesigned:
+   - The old narrow vertical rail is removed.
+   - When hidden, only a professional floating menu button remains.
+   - Opening/closing is smooth and does not distort layout.
+
+2. Language switching:
+   - Switching Arabic/English now applies immediately without refreshing the browser.
+   - Current route content is re-mounted safely to refresh translated labels.
+   - DOM translation pass was strengthened for text and attributes.
+
+3. Color modes:
+   - Dark, light, aurora, and pearl modes have clearer visual differences.
+   - Panels, cards, controls, dock, inputs, and overlays use the selected theme consistently.
+
+Quality:
+- No backend/database changes required.
+- Previous print/export white-screen fix remains preserved.

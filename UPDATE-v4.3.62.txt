@@ -1,0 +1,6 @@
+v4.3.62 - Actual final fixes for report layout/export issues
+- Fixed inpatient layout width and vertical icon scrolling without sideways clipping.
+- Fixed needs report numbering in generated template and print/export output as: 1 - item.
+- Reworked export capture hosts to render off-screen instead of hidden/negative stacking, preventing blank PDF pages.
+- Added export cleanup guards to remove stale capture/backdrop layers.
+- Polished health merge strip and inpatient action cards so text/icons are not clipped.

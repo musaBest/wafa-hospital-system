@@ -1,0 +1,48 @@
+Wafa Hospital System v4.3.16
+============================
+
+Final access-control and Ministry portal update built on v4.3.15.
+
+1) Dedicated Social Service account
+-----------------------------------
+Username: social.service
+Password: Social@2026
+Role: social_worker
+
+- Logs directly into the inpatient Social & Psychological Service screen.
+- Does not receive access to inpatient administration, rehabilitation, finance, MOH portal,
+  patients, billing, reports, or system administration unless additional permissions are
+  explicitly assigned later by an authorized administrator.
+- Can open inpatient cases by national ID, save the social/psychological assessment, and
+  print/export its reports according to the social-service permission set.
+
+2) Users & Permissions by hospital department/branch
+-----------------------------------------------------
+- Added role templates for Reception, Rehabilitation Specialist, Social Worker,
+  Inpatient Finance, Ministry of Health and Custom accounts.
+- Added quick department/branch permission cards for:
+  Reception & patients, clinics & doctors, inpatient administration, inpatient rehab,
+  inpatient social service, inpatient finance, Ministry portal, lab/diagnostics,
+  accounting/billing, reports, and system administration.
+- Detailed View/Create/Update/Delete/Print/Export/Fee permissions remain available below
+  the quick selector.
+- The protected treasury owner (Eng.Mohammed_Moqbil) is the only account allowed to grant
+  financial permissions. Once granted to a custom branch account, those exact financial
+  permissions work in the related pages/API routes.
+- The protected treasury account itself remains protected from modification by other users.
+
+3) Ministry of Health - Add hospital patient
+--------------------------------------------
+- MOH users with moh_portal.create can add a new hospital patient directly from the MOH portal.
+- National ID lookup uses the Civil Registry integration and previews name, gender, birth date,
+  address and ID before creation.
+- The created patient is linked to Ministry of Health coverage and receives a hospital medical
+  serial number.
+- Existing-patient detection prevents accidental duplicate creation.
+
+Database notes
+--------------
+No new migration is required for v4.3.16.
+Run `php artisan db:seed` after upgrading so the new social-service role/user and the expanded
+permission templates are synchronized. The login bootstrap also repairs the built-in Social
+Service and MOH accounts if an older database is used.

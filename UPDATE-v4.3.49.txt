@@ -1,0 +1,32 @@
+Wafaa Hospital System v4.3.49
+=================================
+
+Outpatient Physical Therapy
+- Removed coverage class, employee name, relationship, change specialist, and decision link/number from case registration.
+- Session fee is optional.
+- Added "coverage entity covers full cost"; when enabled, the session fee is stored as zero and reports show the covering entity.
+- Case registration now has one clear Save Case button instead of record navigation/action toolbar.
+- Added New Patient action and row-level Delete from PT Department action with confirmation; deleting a PT case also removes its PT sessions, not the hospital's master patient record.
+- Patient diagnosis remains visible in the patient/case tables.
+- Report quick actions are now only:
+  1) All Sessions Count (popup)
+  2) Daily Sessions Count (popup with date selector)
+- PDF / Word / Excel export remain available.
+- Word export uses collapsed, explicit full cell borders to avoid missing table lines.
+
+Head of Physical Therapy account
+Username: physical.therapy.head
+Password: PTHead@2026
+Role: pt_head
+Visible areas:
+- Outpatient Physical Therapy
+- Inpatient Physical Therapy (inside inpatient module)
+No other hospital sections are granted to this role.
+
+Inpatient reports
+- Needs report numbering is rendered as: 1- requirement text, 2- requirement text, etc.
+
+Database
+- Added outpatient_pt_cases.coverage_covers_cost.
+- Added pt_head role permissions and dedicated account.
+- Existing installations: run `php artisan migrate`.

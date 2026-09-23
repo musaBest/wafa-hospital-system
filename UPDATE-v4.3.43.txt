@@ -1,0 +1,10 @@
+Wafaa Hospital System v4.3.43
+================================
+Outpatient Physical Therapy report export update
+
+- Added PDF export for outpatient physical therapy reports.
+- Added Microsoft Word export for outpatient physical therapy reports.
+- Reworked Excel export with RTL layout, merged report header, grey banner, borders, row heights, wrapped text, column widths, and landscape print settings.
+- PDF, Word, Excel and browser print now share the legacy physical-therapy report layout shown in the supplied reference image.
+- Report dates are rendered as DD/MM/YYYY and the session period is kept inside a dedicated wide column to prevent overlap.
+- Exported table columns follow the reference order: sequence, patient number, patient name, sessions count, city, date of birth, sessions period, admission date, session fee.

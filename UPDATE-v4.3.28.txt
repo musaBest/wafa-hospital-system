@@ -1,0 +1,6 @@
+WAFAA Hospital System v4.3.28
+
+- Final adjustment for inpatient rehabilitation Needs Report numbering.
+- Needs list is now rendered as: 1- item, 2- item, with the number fixed on the right and the text immediately after it.
+- Improved spacing and RTL/LTR isolation for printed PDF/Word/Excel report templates.
+- No migration or seeder changes.

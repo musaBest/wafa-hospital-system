@@ -1,0 +1,43 @@
+Wafa Hospital System v4.3.15
+============================
+
+1) Interactive UI
+- Functional icons/cards are wired as buttons/navigation where they represent actions.
+- Patient list now has direct open/edit/delete icon actions.
+- Rehab report-history cards are clickable and open the saved report details.
+
+2) Rehabilitation needs
+- Saved rehab-needs reports now reopen with the exact checked needs.
+- The latest saved needs are restored automatically when the patient rehab file is reopened.
+- Saved need details include functional status, other diseases and rehabilitation team metadata.
+
+3) Ministry of Health portal
+- New protected role: moh_user.
+- Seeded account:
+  Username: moh
+  Password: MOH@2026
+- MOH users are routed directly to a dedicated inpatient/MOH portal and do not see the normal inpatient administrative/finance/rehab workspace.
+- Current MOH-covered admitted patients list.
+- MOH waiting-list management with Civil Registry lookup.
+- Not-admitted cases list with reason (death, deterioration, unsuitable, refused, transferred, other).
+- MOH reporting with selectable columns and PDF / Excel / Word export.
+
+4) Social and psychological specialist file
+- New inpatient module based on the supplied two-page social/psychological assessment form.
+- Identity lookup opens the related inpatient case and auto-displays personal data.
+- Social/family, economic, relationships, health, problems/needs and proposed interventions sections.
+- Specialist name/signature/date.
+- Save report into the inpatient file and reopen prior reports.
+- PDF / Excel / Word export through the common hospital letterhead exporter.
+
+5) Patient maintenance
+- Added patient edit UI.
+- Added protected patient delete UI with explicit confirmation.
+- Local HIS state removes linked visits, queue items, admissions, requests, invoices, diagnostics, appointments, notes and notifications when a patient is deleted.
+- Backend API now exposes PATCH /patients/{patient} and DELETE /patients/{patient} with patients.update / patients.delete permissions.
+- Added patients.delete permission to the dynamic permission catalog.
+
+Install/update notes
+- No new database migration is required by v4.3.15.
+- php artisan db:seed IS required once after updating so the new MOH account and permissions are created.
+- Log out and sign in again after seeding to refresh the session permissions.

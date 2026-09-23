@@ -1,0 +1,10 @@
+Wafaa Hospital System v4.3.45
+
+Login interaction performance fix:
+- Removed GPU-heavy backdrop blur from the login card and feature tiles.
+- Disabled decorative login animations that caused repeated full-page repaints.
+- Removed focus transforms from username/password fields.
+- Simplified focus shadows and autofill rendering for Chrome/Edge on Windows.
+- Preserved the existing login layout, colors, theme switching, authentication flow, and API behavior.
+
+This update targets the lag that occurs while clicking or selecting/autofilling username and password fields, before the login request is submitted.
