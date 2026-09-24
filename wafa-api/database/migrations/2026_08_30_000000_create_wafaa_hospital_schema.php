@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->timestamps();
         });
         Schema::create('password_reset_tokens', function (Blueprint $table) { $table->string('email')->primary(); $table->string('token'); $table->timestamp('created_at')->nullable(); });
-        Schema::create('personal_access_tokens', function (Blueprint $table) { $table->id(); $table->morphs('tokenable'); $table->text('name'); $table->string('token',64)->unique(); $table->text('abilities')->nullable(); $table->timestamp('last_used_at')->nullable(); $table->timestamp('expires_at')->nullable()->index(); $table->timestamps(); });
+        Schema::create('personal_access_tokens', function (Blueprint $table) { $table->id(); $table->uuidMorphs('tokenable'); $table->text('name'); $table->string('token',64)->unique(); $table->text('abilities')->nullable(); $table->timestamp('last_used_at')->nullable(); $table->timestamp('expires_at')->nullable()->index(); $table->timestamps(); });
 
         Schema::create('sponsors', function (Blueprint $table) { $table->uuid('id')->primary(); $table->string('code')->unique(); $table->string('name_ar'); $table->string('name_en'); $table->boolean('active')->default(true); $table->timestamps(); });
         Schema::create('clinics', function (Blueprint $table) { $table->uuid('id')->primary(); $table->string('key')->unique(); $table->string('name_ar'); $table->string('name_en'); $table->decimal('visit_fee',12,2); $table->boolean('active')->default(true); $table->timestamps(); $table->softDeletes(); });

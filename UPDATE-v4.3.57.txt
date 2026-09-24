@@ -1,3 +1,0 @@
-v4.3.57
-- Corrected doctor name in health reports to: د. سامي عويمر.
-- Built on v4.3.56 with no other functional changes.

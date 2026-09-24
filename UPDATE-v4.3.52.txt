@@ -1,2 +1,0 @@
-Wafaa HIS v4.3.52
-Financial declaration UI overlap/date/export cleanup.
