@@ -1,4 +1,5 @@
 [build]
+  base = "wafa-web"
   publish = "dist"
   command = "npx --yes vite build"
 
