@@ -1,4 +1,10 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+const rawBase = (import.meta.env.VITE_API_BASE_URL || '/api/v1').trim().replace(/\/+$/, '');
+const API_BASE_URL = rawBase.endsWith('/api/v1')
+  ? rawBase
+  : (rawBase.endsWith('/api')
+    ? `${rawBase}/v1`
+    : (rawBase.startsWith('http') ? `${rawBase}/api/v1` : rawBase));
+
 const TOKEN_KEY = 'wafaa_his_api_token_v1';
 
 export const authToken = {

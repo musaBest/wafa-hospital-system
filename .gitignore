@@ -1,0 +1,9 @@
+/node_modules
+/wafa-web/node_modules
+/wafa-api/vendor
+.env
+.env.backup
+.phpunit.result.cache
+*.log
+.DS_Store
+Thumbs.db
