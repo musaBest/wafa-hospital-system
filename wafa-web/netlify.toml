@@ -3,6 +3,12 @@
   command = "npx --yes vite build"
 
 [[redirects]]
+  from = "/api/*"
+  to = "https://wafa-hospital-system.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
